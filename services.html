@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Services & Subscription Management - Zakat Mirath Ease</title>
+    <!-- External CSS if needed -->
+    <link rel="stylesheet" href="style.css" />
+    <!-- Montserrat Font -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Material Icons -->
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined"
+      rel="stylesheet"
+    />
+    <!-- Chart.js (for consistency) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Dummy financeManager.js -->
+    <script>
+      console.log("Dummy financeManager.js loaded.");
+    </script>
+    <style>
+      /* Global Styles */
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background: #f4f4f4;
+      }
+      /* Sidebar Styling (as in the chart file) */
+      .sidebar {
+        position: fixed;
+        left: -250px;
+        top: 0;
+        width: 250px;
+        height: 100%;
+        background: #ffffff;
+        transition: 0.3s;
+        padding-top: 60px;
+        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+      }
+      .sidebar.active {
+        left: 0;
+      }
+      .sidebar ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+      .sidebar ul li {
+        padding: 15px;
+      }
+      .sidebar ul li a {
+        color: #000;
+        text-decoration: none;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+      .sidebar ul li button {
+        width: 100%;
+        background: transparent;
+        border: none;
+        padding: 0;
+        cursor: pointer;
+      }
+      /* Button Base Style */
+      button {
+        padding: 0.8em 1.8em;
+        border: 2px solid #17c3b2;
+        position: relative;
+        overflow: hidden;
+        background-color: transparent;
+        text-align: center;
+        text-transform: uppercase;
+        font-size: 16px;
+        transition: 0.3s;
+        z-index: 1;
+        font-family: inherit;
+        color: #17c3b2;
+        cursor: pointer;
+      }
+      button::before {
+        content: "";
+        width: 0;
+        height: 300%;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) rotate(45deg);
+        background: #17c3b2;
+        transition: 0.5s ease;
+        display: block;
+        z-index: -1;
+      }
+      button:hover::before {
+        width: 105%;
+      }
+      button:hover {
+        color: #111;
+      }
+      /* Burger Button (Menu Button) */
+      .btn {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        width: 50px;
+        height: 50px;
+        background: #ffffff;
+        border: none;
+        cursor: pointer;
+        z-index: 1100;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 5px;
+        box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+      }
+      .icon svg rect {
+        fill: #000;
+      }
+      /* Header Styling */
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+      .header-left,
+      .header-right {
+        display: flex;
+        gap: 10px;
+      }
+      /* Dashboard Overview Cards */
+      .cards {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .card {
+        background: #80ffff;
+        padding: 15px;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        flex: 1;
+        min-width: 200px;
+        text-align: center;
+      }
+      /* Section Common Styles */
+      .section {
+        background: #fff;
+        padding: 20px;
+        margin-top: 20px;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      .section h2 {
+        margin-top: 0;
+      }
+      /* Forms */
+      .add-form input,
+      .add-form select,
+      .add-form button,
+      .settings-form input,
+      .settings-form select,
+      .settings-form button {
+        padding: 8px;
+        margin: 5px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+      }
+      .add-form button,
+      .settings-form button {
+        background: #80ff80;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+      }
+      /* Tables */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+      }
+      table th,
+      table td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+      }
+      table th {
+        background: #80ff80;
+        color: #fff;
+      }
+      /* Main Content Layout */
+      .dashboard {
+        max-width: 1200px;
+        margin: 20px auto;
+        padding: 20px;
+        transition: margin-left 0.3s;
+      }
+      .sidebar.active ~ .dashboard {
+        margin-left: 250px;
+      }
+      /* Settings Page Specific (for Subscription Plans section) */
+      .settings-section {
+        margin-top: 40px;
+      }
+      .settings-section h2 {
+        border-bottom: 2px solid #ddd;
+        padding-bottom: 10px;
+      }
+      .settings-form label {
+        display: block;
+        margin: 10px 0 5px;
+        font-weight: bold;
+      }
+      .settings-form input,
+      .settings-form select {
+        padding: 6px;
+        width: 100%;
+        max-width: 400px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+      }
+      .settings-form button {
+        margin-top: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Menu with Sidebar Toggle Button -->
+    <div class="menu">
+      <button
+        class="btn"
+        onclick="document.getElementById('sidebar').classList.add('active');"
+      >
+        <span class="icon">
+          <svg viewBox="0 0 175 80" width="40" height="40">
+            <rect width="80" height="15" rx="10"></rect>
+            <rect y="30" width="80" height="15" rx="10"></rect>
+            <rect y="60" width="80" height="15" rx="10"></rect>
+          </svg>
+        </span>
+      </button>
+    </div>
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="sidebar">
+      <div class="sidebar-title">
+        <span
+          class="material-icons-outlined"
+          onclick="document.getElementById('sidebar').classList.remove('active');"
+        >
+          close
+        </span>
+      </div>
+      <ul class="sidebar-list">
+        <li class="sidebar-list-item">
+          <a href="index.html" target="_blank">
+            <span class="material-icons-outlined">dashboard</span> Dashboard
+          </a>
+        </li>
+        <li class="sidebar-list-item">
+          <a href="services.html" target="_blank">
+            <span class="material-icons-outlined">inventory_2</span> Services
+          </a>
+        </li>
+        <li class="sidebar-list-item">
+          <a href="categories.html" target="_blank">
+            <span class="material-icons-outlined">category</span> Categories
+          </a>
+        </li>
+        <li class="sidebar-list-item">
+          <a href="admin.html" target="_blank">
+            <span class="material-icons-outlined">groups</span> Admins
+          </a>
+        </li>
+        <li class="sidebar-list-item">
+          <a href="charts.html" target="_blank">
+            <span class="material-icons-outlined">fact_check</span> Charts
+          </a>
+        </li>
+        <li class="sidebar-list-item">
+          <a href="reports.html" target="_blank">
+            <span class="material-icons-outlined">poll</span> Reports
+          </a>
+        </li>
+        <li class="sidebar-list-item">
+          <a href="settings.html" target="_blank">
+            <span class="material-icons-outlined">settings</span> Settings
+          </a>
+        </li>
+        <li class="sidebar-list-item">
+          <button class="logout-btn" onclick="logout()">Log out</button>
+        </li>
+      </ul>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="dashboard">
+      <header class="header">
+        <div class="header-left">
+          <span class="material-icons-outlined">search</span>
+        </div>
+        <div class="header-right">
+          <span class="material-icons-outlined">notifications</span>
+          <span class="material-icons-outlined">email</span>
+          <span class="material-icons-outlined">account_circle</span>
+        </div>
+      </header>
+      <h1 style="text-align: center">Services & Subscription Management</h1>
+
+      <!-- Services Management Section -->
+      <div class="section">
+        <h2>Services Management</h2>
+        <!-- Overview Cards (Optional) -->
+        <div class="cards">
+          <div class="card">
+            <h3>Total Services</h3>
+            <p>15</p>
+          </div>
+          <div class="card">
+            <h3>Active Services</h3>
+            <p>12</p>
+          </div>
+          <div class="card">
+            <h3>Inactive Services</h3>
+            <p>3</p>
+          </div>
+        </div>
+
+        <!-- Add New Service Form -->
+        <div class="add-form">
+          <h3>Add New Service</h3>
+          <input type="text" id="service-name" placeholder="Service Name" />
+          <input
+            type="text"
+            id="service-description"
+            placeholder="Service Description"
+          />
+          <select id="service-status">
+            <option value="Active">Active</option>
+            <option value="Inactive">Inactive</option>
+          </select>
+          <input
+            type="url"
+            id="service-icon"
+            placeholder="Icon URL (optional)"
+          />
+          <button onclick="addService()">Add Service</button>
+        </div>
+
+        <!-- Services Table -->
+        <h2>Existing Services</h2>
+        <table class="transactions-table">
+          <thead>
+            <tr>
+              <th>Service Name</th>
+              <th>Description</th>
+              <th>Status</th>
+              <th>Icon</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="services-body">
+            <tr>
+              <td>Zakat Calculator</td>
+              <td>Automated Zakat computations</td>
+              <td>Active</td>
+              <td><img src="https://via.placeholder.com/30" alt="Icon" /></td>
+              <td>Edit | Delete</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Subscription Plans Management Section -->
+      <div class="section settings-section">
+        <h2>Subscription Plans Management</h2>
+        <!-- Subscription Overview Cards (Optional) -->
+        <div class="cards">
+          <div class="card">
+            <h3>Total Plans</h3>
+            <p>3</p>
+          </div>
+          <div class="card">
+            <h3>Active Plans</h3>
+            <p>3</p>
+          </div>
+          <div class="card">
+            <h3>Monthly Earnings</h3>
+            <p>$4,500</p>
+          </div>
+        </div>
+
+        <!-- Add / Edit Subscription Plan Form -->
+        <div class="add-form">
+          <h3>Add / Edit Subscription Plan</h3>
+          <input type="text" id="plan-name" placeholder="Plan Name" />
+          <input type="number" id="plan-price" placeholder="Plan Price ($)" />
+          <input
+            type="text"
+            id="plan-description"
+            placeholder="Plan Description"
+          />
+          <select id="plan-status">
+            <option value="Active">Active</option>
+            <option value="Inactive">Inactive</option>
+          </select>
+          <button onclick="saveSubscriptionPlan()">Save Plan</button>
+        </div>
+
+        <!-- Subscription Plans Table -->
+        <h2>Existing Subscription Plans</h2>
+        <table class="customer-table">
+          <thead>
+            <tr>
+              <th>Plan Name</th>
+              <th>Price</th>
+              <th>Description</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="plans-body">
+            <tr>
+              <td>Premium</td>
+              <td>$49.99</td>
+              <td>All features unlocked</td>
+              <td>Active</td>
+              <td>Edit | Delete</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <script>
+      // Sidebar Functions
+      function toggleSidebar() {
+        document.getElementById("sidebar").classList.toggle("active");
+      }
+      function closeSidebar() {
+        document.getElementById("sidebar").classList.remove("active");
+      }
+      // Logout Function
+      function logout() {
+        window.location.href = "login.html";
+      }
+
+      // Dummy Service Functions
+      function addService() {
+        const name = document.getElementById("service-name").value;
+        const description = document.getElementById(
+          "service-description"
+        ).value;
+        const status = document.getElementById("service-status").value;
+        const iconUrl =
+          document.getElementById("service-icon").value ||
+          "https://via.placeholder.com/30";
+        const tbody = document.getElementById("services-body");
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${name}</td>
+          <td>${description}</td>
+          <td>${status}</td>
+          <td><img src="${iconUrl}" alt="Icon" /></td>
+          <td>Edit | Delete</td>
+        `;
+        tbody.appendChild(tr);
+        alert("Service added successfully!");
+      }
+
+      // Dummy Subscription Plan Functions
+      function saveSubscriptionPlan() {
+        const planName = document.getElementById("plan-name").value;
+        const planPrice = document.getElementById("plan-price").value;
+        const planDescription =
+          document.getElementById("plan-description").value;
+        const planStatus = document.getElementById("plan-status").value;
+        const tbody = document.getElementById("plans-body");
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${planName}</td>
+          <td>$${planPrice}</td>
+          <td>${planDescription}</td>
+          <td>${planStatus}</td>
+          <td>Edit | Delete</td>
+        `;
+        tbody.appendChild(tr);
+        alert("Subscription plan saved successfully!");
+      }
+    </script>
+    <script src="financeManager.js"></script>
+  </body>
+</html>

@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Finance Management Dashboard</title>
+  <!-- External CSS -->
+  <link rel="stylesheet" href="style.css" />
+  <!-- Montserrat Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <!-- Material Icons -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+  <!-- Chart.js CDN for Data Visualization -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    /* Your existing CSS styles here */
+  </style>
+</head>
+<body>
+  <!-- Menu with Sidebar Toggle Button -->
+  <div class="menu">
+    <button class="btn" onclick="toggleSidebar()">
+      <span class="icon">
+        <svg viewBox="0 0 175 80" width="40" height="40">
+          <rect width="80" height="15" rx="10"></rect>
+          <rect y="30" width="80" height="15" rx="10"></rect>
+          <rect y="60" width="80" height="15" rx="10"></rect>
+        </svg>
+      </span>
+    </button>
+  </div>
+
+  <!-- Sidebar -->
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-title">
+      <span class="material-icons-outlined" onclick="closeSidebar()">close</span>
+    </div>
+    <ul class="sidebar-list">
+      <li class="sidebar-list-item">
+        <a href="index.html" target="_blank">
+          <span class="material-icons-outlined">dashboard</span> Dashboard
+        </a>
+      </li>
+      <!-- Additional sidebar items -->
+      <li class="sidebar-list-item">
+        <button class="logout-btn" onclick="logout()">Log out</button>
+      </li>
+    </ul>
+  </aside>
+
+  <!-- Main Dashboard Content -->
+  <div class="dashboard">
+    <header class="header">
+      <div class="header-left">
+        <span class="material-icons-outlined">search</span>
+      </div>
+      <div class="header-right">
+        <span class="material-icons-outlined">notifications</span>
+        <span class="material-icons-outlined">email</span>
+        <span class="material-icons-outlined">account_circle</span>
+      </div>
+    </header>
+    <h1 style="text-align: center">ZMEASE Management Dashboard</h1>
+
+    <!-- Financial Summary Cards -->
+    <div class="financial-summary">
+      <div class="summary-card">
+        <h3>Total Revenue</h3>
+        <p id="total-revenue">Loading…</p>
+      </div>
+      <div class="summary-card">
+        <h3>Zakat Income</h3>
+        <p id="zakat-income">Loading…</p>
+      </div>
+      <!-- Additional summary cards -->
+    </div>
+
+    <!-- Add Transaction Form -->
+    <div class="section add-form">
+      <input type="text" id="customer-name" placeholder="Customer Name" />
+      <input type="text" id="transaction-description" placeholder="Description" />
+      <input type="number" id="transaction-amount" placeholder="Amount" />
+      <select id="transaction-type">
+        <option value="Income">Income</option>
+        <option value="Expense">Expense</option>
+        <option value="Zakat">Zakat</option>
+        <!-- Additional options -->
+      </select>
+      <button onclick="addNewTransaction()">Add Transaction</button>
+    </div>
+
+    <!-- Transactions Table -->
+    <h2>All Transactions</h2>
+    <table class="transactions-table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Customer</th>
+          <th>Description</th>
+          <th>Amount</th>
+          <th>Type</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="transactions-body">
+        <!-- Transaction rows will be dynamically added here -->
+      </tbody>
+    </table>
+    <button onclick="removeDuplicateTransactions()">Remove Duplicate Transactions</button>
+
+    <!-- Customer Transaction History -->
+    <h2>Customer Transaction History</h2>
+    <div class="customer-selector">
+      <select id="customer-select" onchange="viewCustomerTransactions()">
+        <option value="">Select a Customer</option>
+        <!-- Customer options will be dynamically added here -->
+      </select>
+    </div>
+    <table class="customer-table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Description</th>
+          <th>Amount</th>
+          <th>Type</th>
+        </tr>
+      </thead>
+      <tbody id="customer-body">
+        <!-- Customer transaction rows will be dynamically added here -->
+      </tbody>
+    </table>
+  </div>
+
+  <!-- JavaScript for Dashboard Functionality -->
+  <script>
+    let transactions = [];
+
+    function toggleSidebar() {
+      document.getElementById("sidebar").classList.toggle("active");
+    }
+
+    function closeSidebar() {
+      document.getElementById("sidebar").classList.remove("active");
+    }
+
+    function logout() {
+      window.location.href = "login.html";
+    }
+
+    function addNewTransaction() {
+      const customerName = document.getElementById("customer-name").value;
+      const description = document.getElementById("transaction-description").value;
+      const amount = parseFloat(document.getElementById("transaction-amount").value);
+      const type = document.getElementById("transaction-type").value;
+
+      if (!customerName || !description || isNaN(amount) || !type) {
+        alert("Please fill in all fields.");
+        return;
+      }
+
+      const transaction = {
+        date: new Date().toISOString().split("T")[0],
+        customer: customerName,
+        description: description,
+        amount: amount,
+        type: type
+      };
+
+      transactions.push(transaction);
+      updateTransactionsTable();
+      updateFinancialSummary();
+      updateCustomerSelector();
+    }
+
+    function updateTransactionsTable() {
+      const tbody = document.getElementById("transactions-body");
+      tbody.innerHTML = "";
+      transactions.forEach((txn, index) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${txn.date}</td>
+          <td>${txn.customer}</td>
+          <td>${txn.description}</td>
+          <td>$${txn.amount.toFixed(2)}</td>
+          <td>${txn.type}</td>
+          <td>
+            <button onclick="editTransaction(${index})">Edit</button
+::contentReference[oaicite:0]{index=0}
+<button onclick="editTransaction(${index})">Edit</button>
+<button onclick="deleteTransaction(${index})">Delete</button>
+</td>
+`;
+tbody.appendChild(row);
+});
+}
+
+function updateCustomerSelector() {
+const select = document.getElementById("customer-select");
+const uniqueCustomers = [...new Set(transactions.map(txn => txn.customer))];
+select.innerHTML = `<option value="">Select a Customer</option>`;
+uniqueCustomers.forEach(customer => {
+const option = document.createElement("option");
+option.value = customer;
+option.textContent = customer;
+select.appendChild(option);
+});
+}
+
+function updateFinancialSummary() {
+const totalIncome = transactions
+.filter(txn => txn.type === "Income")
+.reduce((sum, txn) => sum + txn.amount, 0);
+
+const zakat = totalIncome * 0.10;
+
+document.getElementById("total-revenue").textContent = `$${totalIncome.toFixed(2)}`;
+document.getElementById("zakat-income").textContent = `$${zakat.toFixed(2)}`;
+}
+
+function viewCustomerTransactions() {
+const selectedCustomer = document.getElementById("customer-select").value;
+const tbody = document.getElementById("customer-body");
+tbody.innerHTML = "";
+
+const customerTransactions = transactions.filter(txn => txn.customer === selectedCustomer);
+customerTransactions.forEach(txn => {
+const row = document.createElement("tr");
+row.innerHTML = `
+<td>${txn.date}</td>
+<td>${txn.description}</td>
+<td>$${txn.amount.toFixed(2)}</td>
+<td>${txn.type}</td>
+`;
+tbody.appendChild(row);
+});
+}
+
+function editTransaction(index) {
+const txn = transactions[index];
+const newCustomer = prompt("Edit Customer Name:", txn.customer);
+const newDescription = prompt("Edit Description:", txn.description);
+const newAmount = parseFloat(prompt("Edit Amount:", txn.amount));
+const newType = prompt("Edit Type (Income/Expense/Zakat):", txn.type);
+
+if (!newCustomer || !newDescription || isNaN(newAmount) || !newType) {
+alert("Invalid input. Edit canceled.");
+return;
+}
+
+transactions[index] = {
+...txn,
+customer: newCustomer,
+description: newDescription,
+amount: newAmount,
+type: newType
+};
+
+updateTransactionsTable();
+updateFinancialSummary();
+updateCustomerSelector();
+}
+
+function deleteTransaction(index) {
+if (confirm("Are you sure you want to delete this transaction?")) {
+transactions.splice(index, 1);
+updateTransactionsTable();
+updateFinancialSummary();
+updateCustomerSelector();
+viewCustomerTransactions();
+}
+}
+
+function removeDuplicateTransactions() {
+const uniqueTransactions = [];
+const seen = new Set();
+
+for (const txn of transactions) {
+const identifier = `${txn.date}-${txn.customer}-${txn.description}-${txn.amount}-${txn.type}`;
+if (!seen.has(identifier)) {
+seen.add(identifier);
+uniqueTransactions.push(txn);
+}
+}
+
+transactions = uniqueTransactions;
+updateTransactionsTable();
+updateFinancialSummary();
+updateCustomerSelector();
+alert("Duplicate transactions removed.");
+}
+</script>
+</body>
+</html>

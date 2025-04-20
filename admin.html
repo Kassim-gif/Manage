@@ -1,0 +1,1573 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Panel - Zakat Mirath Ease</title>
+
+    <!-- Montserrat Font -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Material Icons -->
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined"
+      rel="stylesheet"
+    />
+    <!-- Chart.js CDN for Data Visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Dummy financeManager.js content to avoid conflicts -->
+    <script>
+      // Dummy financeManager.js logic
+      console.log("Dummy financeManager.js loaded.");
+    </script>
+
+    <style>
+      /* Global Styles */
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background: #f4f4f4;
+      }
+      /* Sidebar Styling using CSS transform for sliding effect */
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 200px;
+        height: 100%;
+        background: #ffffff;
+        transform: translateX(-200px);
+        transition: transform 0.3s ease;
+        padding-top: 60px;
+        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+      }
+      .sidebar.active {
+        transform: translateX(0);
+      }
+      .sidebar ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+      .sidebar ul li {
+        padding: 8px 10px;
+      }
+      .sidebar ul li a {
+        color: #000;
+        text-decoration: none;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+      }
+      .material-icons-outlined {
+        font-size: 16px;
+        line-height: 1;
+      }
+      .sidebar ul li button {
+        width: 100%;
+        background: transparent;
+        border: none;
+        padding: 0;
+        cursor: pointer;
+      }
+      /* Button Base Style */
+      button {
+        padding: 0.8em 1.8em;
+        border: 2px solid #17c3b2;
+        position: relative;
+        overflow: hidden;
+        background-color: transparent;
+        text-align: center;
+        text-transform: uppercase;
+        font-size: 16px;
+        transition: 0.3s;
+        z-index: 1;
+        font-family: inherit;
+        color: #17c3b2;
+        cursor: pointer;
+      }
+      button::before {
+        content: "";
+        width: 0;
+        height: 300%;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) rotate(45deg);
+        background: #17c3b2;
+        transition: 0.5s ease;
+        display: block;
+        z-index: -1;
+      }
+      button:hover::before {
+        width: 105%;
+      }
+      button:hover {
+        color: #111;
+      }
+      /* Burger Button (Menu Button) */
+      .btn {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        width: 50px;
+        height: 50px;
+        background: #ffffff;
+        border: none;
+        cursor: pointer;
+        z-index: 1100;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 5px;
+        box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+      }
+      .icon svg rect {
+        fill: #000;
+      }
+      /* Header Styling */
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+      .header-left,
+      .header-right {
+        display: flex;
+        gap: 10px;
+      }
+      /* Dashboard Overview Cards */
+      .cards {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .card {
+        background: #80ffff;
+        padding: 15px;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        flex: 1;
+        min-width: 180px;
+        text-align: center;
+      }
+      /* Section Common Styles */
+      .section {
+        background: #fff;
+        padding: 20px;
+        margin-top: 20px;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      .section h2 {
+        margin-top: 0;
+      }
+      form,
+      .add-form {
+        margin-bottom: 20px;
+      }
+      form input,
+      form select,
+      form button,
+      .add-form input,
+      .add-form select,
+      .add-form button {
+        padding: 8px;
+        margin: 5px 10px 5px 0;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+      }
+      form button,
+      .add-form button {
+        background: #80ff80;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+      }
+      th,
+      td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+      }
+      th {
+        background: #80ff80;
+        color: #fff;
+      }
+      /* Financial & Compliance Reports Styles */
+      .financial-reports .summary-metrics,
+      .financial-reports .advanced-filters,
+      .financial-reports .data-visualization,
+      .financial-reports .report-generator,
+      .financial-reports .report-results,
+      .financial-reports .compliance-checklist,
+      .financial-reports .audit-trail {
+        margin-bottom: 20px;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        background: #f9f9f9;
+      }
+      .financial-reports .metrics-cards {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+      }
+      .financial-reports .metric-card {
+        background: #80ffff;
+        padding: 10px;
+        border-radius: 5px;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        flex: 1;
+        min-width: 120px;
+        text-align: center;
+      }
+      .compliance-checklist ul {
+        list-style: none;
+        padding: 0;
+      }
+      .compliance-checklist li {
+        margin-bottom: 8px;
+      }
+      /* User & Subscription Management Styles */
+      .user-management,
+      .subscription-management {
+        margin-bottom: 20px;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        background: #f9f9f9;
+      }
+      .users-table,
+      .tiers-table {
+        margin-top: 10px;
+      }
+      /* Organizational & Advanced Modules */
+      .organization-management,
+      .subscription-billing,
+      .financial-management,
+      .reporting-compliance,
+      .system-integration {
+        margin-bottom: 20px;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        background: #f9f9f9;
+      }
+      /* Main Dashboard Layout */
+      .dashboard {
+        max-width: 1200px;
+        margin: 20px auto;
+        padding: 20px;
+        transition: margin-left 0.3s;
+      }
+      .sidebar.active ~ .dashboard {
+        margin-left: 200px;
+      }
+      /* Charts */
+      .charts-container {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+        padding-top: 60px;
+      }
+      .chart-card {
+        background: #fff;
+        padding: 15px;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      .chart-title {
+        margin-bottom: 10px;
+        font-size: 16px;
+        text-align: center;
+      }
+      .chart-container {
+        width: 300px;
+        height: 150px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Menu with Sidebar Toggle Button -->
+    <div class="menu">
+      <!-- Inline onclick now directly adds the active class -->
+      <button
+        class="btn"
+        id="menuBtn"
+        onclick="document.getElementById('sidebar').classList.add('active');"
+      >
+        <span class="icon">
+          <svg viewBox="0 0 175 80" width="40" height="40">
+            <rect width="80" height="15" rx="10"></rect>
+            <rect y="30" width="80" height="15" rx="10"></rect>
+            <rect y="60" width="80" height="15" rx="10"></rect>
+          </svg>
+        </span>
+      </button>
+    </div>
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="sidebar">
+      <div class="sidebar-title">
+        <!-- Inline onclick removes the active class -->
+        <span
+          class="material-icons-outlined"
+          id="closeBtn"
+          onclick="document.getElementById('sidebar').classList.remove('active');"
+        >
+          close
+        </span>
+      </div>
+      <ul class="sidebar-list">
+        <li class="sidebar-list-item">
+          <a href="index.html" target="_blank">
+            <span class="material-icons-outlined">dashboard</span> Dashboard
+          </a>
+        </li>
+        <li class="sidebar-list-item">
+          <a href="services.html" target="_blank">
+            <span class="material-icons-outlined">inventory_2</span> Services
+          </a>
+        </li>
+        <li class="sidebar-list-item">
+          <a href="#" target="_blank">
+            <span class="material-icons-outlined">category</span> Categories
+          </a>
+        </li>
+        <li class="sidebar-list-item">
+          <a href="admin.html" target="_blank">
+            <span class="material-icons-outlined">groups</span> Admins
+          </a>
+        </li>
+        <li class="sidebar-list-item">
+          <a href="charts.html" target="_blank">
+            <span class="material-icons-outlined">fact_check</span> Charts
+          </a>
+        </li>
+        <li class="sidebar-list-item">
+          <a href="reports.html" target="_blank">
+            <span class="material-icons-outlined">poll</span> Reports
+          </a>
+        </li>
+        <li class="sidebar-list-item">
+          <a href="settings.html" target="_blank">
+            <span class="material-icons-outlined">settings</span> Settings
+          </a>
+        </li>
+        <li class="sidebar-list-item">
+          <button class="logout-btn" onclick="logout()">Log out</button>
+        </li>
+      </ul>
+    </aside>
+
+    <!-- Main Dashboard Content -->
+    <div class="dashboard">
+      <header class="header">
+        <div class="header-left">
+          <span class="material-icons-outlined">search</span>
+        </div>
+        <div class="header-right">
+          <span class="material-icons-outlined">notifications</span>
+          <span class="material-icons-outlined">email</span>
+          <span class="material-icons-outlined">account_circle</span>
+        </div>
+      </header>
+      <h1 style="text-align: center">Admin Panel - Zakat Mirath Ease</h1>
+
+      <!-- Dashboard Overview Cards -->
+      <div class="cards">
+        <div class="card">
+          <h3>Total Donations</h3>
+          <p>$10,000.00</p>
+        </div>
+        <div class="card">
+          <h3>Pending Donations</h3>
+          <p>$2,500.00</p>
+        </div>
+        <div class="card">
+          <h3>Total Beneficiaries</h3>
+          <p>35</p>
+        </div>
+        <div class="card">
+          <h3>Monthly Financials</h3>
+          <p>View Report</p>
+        </div>
+      </div>
+
+      <!-- Transaction Management Section -->
+      <div class="section">
+        <h2>Transaction Management</h2>
+        <div class="financial-summary">
+          <div class="summary-card">
+            <h3>Pending Zakat</h3>
+            <p id="gst-amount">$0.00</p>
+          </div>
+          <div class="summary-card">
+            <h3>Paid Zakat</h3>
+            <p id="paid-gst-amount">$0.00</p>
+          </div>
+          <div class="summary-card">
+            <h3>Unpaid Zakat</h3>
+            <p id="Zakat-count">0</p>
+          </div>
+          <div class="summary-card">
+            <h3>Total</h3>
+            <p id="receivables-amount">$0.00</p>
+          </div>
+        </div>
+        <div class="section add-form">
+          <input type="text" id="customer-name" placeholder="Customer Name" />
+          <input
+            type="text"
+            id="transaction-description"
+            placeholder="Description"
+          />
+          <input type="number" id="transaction-amount" placeholder="Amount" />
+          <select id="transaction-type">
+            <option value="Income">Income</option>
+            <option value="Expense">Expense</option>
+            <option value="GST">Zakat</option>
+            <option value="Bill">Bill</option>
+            <option value="Paid GST">Paid Zakat</option>
+            <option value="Paid Bill">Paid Bill</option>
+          </select>
+          <button onclick="addNewTransaction()">Add Transaction</button>
+        </div>
+        <h2>All Transactions</h2>
+        <table class="transactions-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Customer</th>
+              <th>Description</th>
+              <th>Amount</th>
+              <th>Type</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="transactions-body">
+            <tr>
+              <td>2025-02-15</td>
+              <td>Ali Hassan</td>
+              <td>Zakat Contribution</td>
+              <td>$500.00</td>
+              <td>Income</td>
+              <td>Edit | Delete</td>
+            </tr>
+          </tbody>
+        </table>
+        <button onclick="removeDuplicateTransactions()">
+          Remove Duplicate Transactions
+        </button>
+        <h2>Customer Transaction History</h2>
+        <div class="customer-selector">
+          <select id="customer-select" onchange="viewCustomerTransactions()">
+            <option value="">Select a Customer</option>
+            <option value="Ali Hassan">Ali Hassan</option>
+            <option value="Fatima Noor">Fatima Noor</option>
+          </select>
+        </div>
+        <table class="customer-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Description</th>
+              <th>Amount</th>
+              <th>Type</th>
+            </tr>
+          </thead>
+          <tbody id="customer-body">
+            <tr>
+              <td>2025-02-15</td>
+              <td>Zakat Contribution</td>
+              <td>$500.00</td>
+              <td>Income</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Beneficiary Management Module -->
+      <div class="section beneficiary-management">
+        <h2>Beneficiary Management</h2>
+        <p>Manage beneficiary records and disbursement statuses.</p>
+        <div class="add-form">
+          <h3>Add New Beneficiary</h3>
+          <form id="beneficiary-form">
+            <input
+              type="text"
+              id="beneficiary-name"
+              placeholder="Beneficiary Name"
+              required
+            />
+            <input
+              type="text"
+              id="beneficiary-contact"
+              placeholder="Contact Info"
+              required
+            />
+            <input
+              type="text"
+              id="beneficiary-address"
+              placeholder="Address"
+              required
+            />
+            <select id="beneficiary-status">
+              <option value="Eligible">Eligible</option>
+              <option value="Not Eligible">Not Eligible</option>
+            </select>
+            <select id="disbursement-status">
+              <option value="Pending">Pending</option>
+              <option value="Disbursed">Disbursed</option>
+            </select>
+            <button type="submit">Add Beneficiary</button>
+          </form>
+        </div>
+        <div class="beneficiaries-table">
+          <h3>Existing Beneficiaries</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Contact</th>
+                <th>Address</th>
+                <th>Eligibility</th>
+                <th>Disbursement</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="beneficiary-body">
+              <tr>
+                <td>John Doe</td>
+                <td>+123456789</td>
+                <td>123 Main St</td>
+                <td>Eligible</td>
+                <td>Pending</td>
+                <td>
+                  <button onclick="editBeneficiary(this)">Edit</button>
+                  <button onclick="deleteBeneficiary(this)">Delete</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Financial & Compliance Reports Module -->
+      <div class="section financial-reports">
+        <h2>Financial & Compliance Reports</h2>
+        <p>
+          Generate detailed financial reports, view audit trails, ensure
+          regulatory compliance, and gain insights through advanced data
+          visualization.
+        </p>
+        <!-- Summary Metrics -->
+        <div class="summary-metrics">
+          <h3>Summary Metrics</h3>
+          <div class="metrics-cards">
+            <div class="metric-card">
+              <h4>Total Income</h4>
+              <p id="total-income">$0.00</p>
+            </div>
+            <div class="metric-card">
+              <h4>Total Expense</h4>
+              <p id="total-expense">$0.00</p>
+            </div>
+            <div class="metric-card">
+              <h4>Net Profit</h4>
+              <p id="net-profit">$0.00</p>
+            </div>
+          </div>
+        </div>
+        <!-- Advanced Filters -->
+        <div class="advanced-filters">
+          <h3>Advanced Filters</h3>
+          <form id="filters-form">
+            <label for="filter-category">Category:</label>
+            <select id="filter-category">
+              <option value="All">All</option>
+              <option value="Income">Income</option>
+              <option value="Expense">Expense</option>
+              <option value="Donations">Donations</option>
+            </select>
+            <label for="filter-department">Department:</label>
+            <select id="filter-department">
+              <option value="All">All</option>
+              <option value="Finance">Finance</option>
+              <option value="Operations">Operations</option>
+            </select>
+            <button type="button" onclick="applyFilters()">
+              Apply Filters
+            </button>
+          </form>
+        </div>
+        <!-- Data Visualization (Minimal Size Chart) -->
+        <div class="data-visualization">
+          <h3>Data Visualization</h3>
+          <canvas id="reportChart" width="300" height="150"></canvas>
+        </div>
+        <!-- Financial Report Generator -->
+        <div class="report-generator">
+          <h3>Generate Financial Report</h3>
+          <form id="report-form">
+            <label for="report-start-date">Start Date:</label>
+            <input type="date" id="report-start-date" required />
+            <label for="report-end-date">End Date:</label>
+            <input type="date" id="report-end-date" required />
+            <label for="report-type">Type:</label>
+            <select id="report-type">
+              <option value="All">All</option>
+              <option value="Income">Income</option>
+              <option value="Expense">Expense</option>
+              <option value="Donations">Donations</option>
+            </select>
+            <button type="submit">Generate Report</button>
+          </form>
+        </div>
+        <!-- Report Results Table -->
+        <div class="report-results">
+          <h3>Report Results</h3>
+          <table id="report-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Description</th>
+                <th>Amount</th>
+                <th>Type</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Report data will be populated here -->
+            </tbody>
+          </table>
+          <button onclick="exportReport()">Export Report (CSV)</button>
+        </div>
+        <!-- Compliance Checklist -->
+        <div class="compliance-checklist">
+          <h3>Compliance Checklist</h3>
+          <ul>
+            <li>
+              <input type="checkbox" id="check1" />
+              <label for="check1">Financial Statement Reviewed</label>
+            </li>
+            <li>
+              <input type="checkbox" id="check2" />
+              <label for="check2">Audit Completed</label>
+            </li>
+            <li>
+              <input type="checkbox" id="check3" />
+              <label for="check3">Regulatory Filing Submitted</label>
+            </li>
+            <li>
+              <input type="checkbox" id="check4" />
+              <label for="check4">Internal Controls Updated</label>
+            </li>
+          </ul>
+        </div>
+        <!-- Audit Trail Section -->
+        <div class="audit-trail">
+          <h3>Audit Trail</h3>
+          <table id="audit-table">
+            <thead>
+              <tr>
+                <th>Date & Time</th>
+                <th>Action</th>
+                <th>User</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>2025-02-15 10:00 AM</td>
+                <td>Added Transaction</td>
+                <td>Admin</td>
+              </tr>
+              <tr>
+                <td>2025-02-15 10:05 AM</td>
+                <td>Updated Beneficiary</td>
+                <td>Admin</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- User & Subscription Management Module -->
+      <div class="section user-management">
+        <h2>User & Subscription Management</h2>
+        <p>
+          Administer stakeholder accounts, manage subscription tiers, and
+          control access levels.
+        </p>
+        <!-- User Accounts Management -->
+        <div class="user-management">
+          <h3>User Accounts Management</h3>
+          <form id="user-form">
+            <label for="user-name">Full Name:</label>
+            <input
+              type="text"
+              id="user-name"
+              placeholder="Full Name"
+              required
+            />
+            <label for="user-email">Email:</label>
+            <input type="email" id="user-email" placeholder="Email" required />
+            <label for="user-role">Role:</label>
+            <select id="user-role">
+              <option value="Admin">Admin</option>
+              <option value="Manager">Manager</option>
+              <option value="Subscriber">Subscriber</option>
+            </select>
+            <label for="user-tier">Subscription Tier:</label>
+            <select id="user-tier">
+              <option value="Free">Free</option>
+              <option value="Basic">Basic</option>
+              <option value="Premium">Premium</option>
+            </select>
+            <label for="user-status">Status:</label>
+            <select id="user-status">
+              <option value="Active">Active</option>
+              <option value="Inactive">Inactive</option>
+            </select>
+            <button type="submit">Add User</button>
+          </form>
+          <div class="users-table">
+            <h4>Existing Users</h4>
+            <table id="users-table">
+              <thead>
+                <tr>
+                  <th>Full Name</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>Tier</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Alice Smith</td>
+                  <td>alice@example.com</td>
+                  <td>Admin</td>
+                  <td>Premium</td>
+                  <td>Active</td>
+                  <td>
+                    <button onclick="editUser(this)">Edit</button>
+                    <button onclick="deleteUser(this)">Delete</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Subscription Tier Management -->
+        <div class="subscription-management">
+          <h3>Subscription Tier Management</h3>
+          <form id="tier-form">
+            <label for="tier-name">Tier Name:</label>
+            <input
+              type="text"
+              id="tier-name"
+              placeholder="Tier Name"
+              required
+            />
+            <label for="tier-price">Price:</label>
+            <input type="number" id="tier-price" placeholder="Price" required />
+            <label for="tier-features">Features:</label>
+            <input
+              type="text"
+              id="tier-features"
+              placeholder="Features"
+              required
+            />
+            <button type="submit">Add Tier</button>
+          </form>
+          <div class="tiers-table">
+            <h4>Existing Subscription Tiers</h4>
+            <table id="tiers-table">
+              <thead>
+                <tr>
+                  <th>Tier Name</th>
+                  <th>Price</th>
+                  <th>Features</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Premium</td>
+                  <td>$49.99</td>
+                  <td>All Features</td>
+                  <td>
+                    <button onclick="editTier(this)">Edit</button>
+                    <button onclick="deleteTier(this)">Delete</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Organizational & User Management Module -->
+      <div class="section organization-management">
+        <h2>Organizational & User Management</h2>
+        <p>
+          Define your departments, teams, and reporting hierarchies. Manage
+          detailed user profiles with extended information and automated
+          onboarding.
+        </p>
+        <div class="hierarchical-organization">
+          <h3>Hierarchical Organization Module</h3>
+          <form id="org-form">
+            <label for="department-name">Department:</label>
+            <input
+              type="text"
+              id="department-name"
+              placeholder="Department Name"
+              required
+            />
+            <label for="team-name">Team:</label>
+            <input
+              type="text"
+              id="team-name"
+              placeholder="Team Name"
+              required
+            />
+            <label for="manager-name">Manager:</label>
+            <input
+              type="text"
+              id="manager-name"
+              placeholder="Manager Name"
+              required
+            />
+            <button type="submit">Add Organization Unit</button>
+          </form>
+          <div class="org-table">
+            <h4>Organization Structure</h4>
+            <table id="org-table">
+              <thead>
+                <tr>
+                  <th>Department</th>
+                  <th>Team</th>
+                  <th>Manager</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Finance</td>
+                  <td>Accounting</td>
+                  <td>John Manager</td>
+                  <td>
+                    <button onclick="editOrg(this)">Edit</button>
+                    <button onclick="deleteOrg(this)">Delete</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="user-profiles">
+          <h3>User & Stakeholder Profiles</h3>
+          <form id="profile-form">
+            <label for="profile-name">Full Name:</label>
+            <input
+              type="text"
+              id="profile-name"
+              placeholder="Full Name"
+              required
+            />
+            <label for="profile-contact">Contact:</label>
+            <input
+              type="text"
+              id="profile-contact"
+              placeholder="Contact Info"
+              required
+            />
+            <label for="profile-id">ID Document:</label>
+            <input type="file" id="profile-id" />
+            <label for="profile-cert">Certifications:</label>
+            <input type="text" id="profile-cert" placeholder="Certifications" />
+            <button type="submit">Register Profile</button>
+          </form>
+          <div class="profiles-table">
+            <h4>Existing Profiles</h4>
+            <table id="profiles-table">
+              <thead>
+                <tr>
+                  <th>Full Name</th>
+                  <th>Contact</th>
+                  <th>ID Document</th>
+                  <th>Certifications</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Alice Johnson</td>
+                  <td>+123456789</td>
+                  <td>Uploaded</td>
+                  <td>CPA, CFA</td>
+                  <td>
+                    <button onclick="editProfile(this)">Edit</button>
+                    <button onclick="deleteProfile(this)">Delete</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Advanced Subscription & Billing Module -->
+      <div class="section subscription-billing">
+        <h2>Advanced Subscription & Billing</h2>
+        <p>
+          Manage subscription tiers with renewal dates, trial periods, and
+          billing cycles. Track invoices and payment history.
+        </p>
+        <form id="billing-form">
+          <label for="sub-tier">Subscription Tier:</label>
+          <input type="text" id="sub-tier" placeholder="Tier Name" required />
+          <label for="renewal-date">Renewal Date:</label>
+          <input type="date" id="renewal-date" required />
+          <label for="trial-period">Trial Period (days):</label>
+          <input
+            type="number"
+            id="trial-period"
+            placeholder="Trial Period"
+            required
+          />
+          <label for="billing-cycle">Billing Cycle:</label>
+          <select id="billing-cycle">
+            <option value="Monthly">Monthly</option>
+            <option value="Yearly">Yearly</option>
+          </select>
+          <button type="submit">Add Subscription Tier</button>
+        </form>
+        <div class="invoice-history">
+          <h3>Invoice & Payment History</h3>
+          <table id="invoice-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Tier</th>
+                <th>Amount</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>2025-03-01</td>
+                <td>Premium</td>
+                <td>$49.99</td>
+                <td>Paid</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Financial Management Module -->
+      <div class="section financial-management">
+        <h2>Financial Management</h2>
+        <p>
+          Access a comprehensive financial dashboard with tax summaries,
+          liabilities, asset management, and automated payment processing.
+        </p>
+        <div class="financial-dashboard">
+          <h3>Comprehensive Financial Dashboard</h3>
+          <div class="metrics-cards">
+            <div class="metric-card">
+              <h4>Total Revenue</h4>
+              <p id="total-revenue">$0.00</p>
+            </div>
+            <div class="metric-card">
+              <h4>Total Expenses</h4>
+              <p id="total-expenses">$0.00</p>
+            </div>
+            <div class="metric-card">
+              <h4>Tax Liability</h4>
+              <p id="tax-liability">$0.00</p>
+            </div>
+          </div>
+        </div>
+        <div class="liabilities-assets">
+          <h3>Liabilities & Assets Management</h3>
+          <form id="liabilities-form">
+            <label for="liability-name">Liability Name:</label>
+            <input
+              type="text"
+              id="liability-name"
+              placeholder="Liability Name"
+              required
+            />
+            <label for="liability-amount">Amount:</label>
+            <input
+              type="number"
+              id="liability-amount"
+              placeholder="Amount"
+              required
+            />
+            <label for="due-date">Due Date:</label>
+            <input type="date" id="due-date" required />
+            <button type="submit">Add Liability</button>
+          </form>
+          <div class="assets-management">
+            <h3>Asset Management</h3>
+            <form id="assets-form">
+              <label for="asset-name">Asset Name:</label>
+              <input
+                type="text"
+                id="asset-name"
+                placeholder="Asset Name"
+                required
+              />
+              <label for="asset-value">Value:</label>
+              <input
+                type="number"
+                id="asset-value"
+                placeholder="Value"
+                required
+              />
+              <label for="depreciation">Depreciation (%):</label>
+              <input
+                type="number"
+                id="depreciation"
+                placeholder="Depreciation"
+                required
+              />
+              <button type="submit">Add Asset</button>
+            </form>
+          </div>
+        </div>
+        <div class="payment-processing">
+          <h3>Payments to Organizations</h3>
+          <form id="payment-form">
+            <label for="vendor-name">Vendor Name:</label>
+            <input
+              type="text"
+              id="vendor-name"
+              placeholder="Vendor Name"
+              required
+            />
+            <label for="payment-amount">Amount:</label>
+            <input
+              type="number"
+              id="payment-amount"
+              placeholder="Amount"
+              required
+            />
+            <label for="payment-date">Payment Date:</label>
+            <input type="date" id="payment-date" required />
+            <button type="submit">Process Payment</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Reporting & Compliance Enhanced Module -->
+      <div class="section reporting-compliance">
+        <h2>Reporting & Compliance Enhanced</h2>
+        <p>
+          Generate advanced reports with multi‑criteria selection, visualize
+          data interactively, and secure the system with MFA, digital
+          verification, and automated notifications.
+        </p>
+        <div class="verification-security">
+          <h3>Verification & Security</h3>
+          <form id="security-form">
+            <label for="mfa-enabled">Enable MFA:</label>
+            <select id="mfa-enabled">
+              <option value="Yes">Yes</option>
+              <option value="No">No</option>
+            </select>
+            <label for="digital-signature">Digital Signature:</label>
+            <select id="digital-signature">
+              <option value="Enabled">Enabled</option>
+              <option value="Disabled">Disabled</option>
+            </select>
+            <button type="button" onclick="saveSecuritySettings()">
+              Save Security Settings
+            </button>
+          </form>
+        </div>
+        <div class="notifications-setup">
+          <h3>Email & Notification Integration</h3>
+          <form id="notifications-form">
+            <label for="email-alerts">Email Alerts:</label>
+            <select id="email-alerts">
+              <option value="Enabled">Enabled</option>
+              <option value="Disabled">Disabled</option>
+            </select>
+            <label for="sms-alerts">SMS Alerts:</label>
+            <select id="sms-alerts">
+              <option value="Enabled">Enabled</option>
+              <option value="Disabled">Disabled</option>
+            </select>
+            <label for="push-notifications">Push Notifications:</label>
+            <select id="push-notifications">
+              <option value="Enabled">Enabled</option>
+              <option value="Disabled">Disabled</option>
+            </select>
+            <button type="button" onclick="saveNotificationSettings()">
+              Save Notification Settings
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- System Integration & Scalability Module -->
+      <div class="section system-integration">
+        <h2>System Integration & Scalability</h2>
+        <p>
+          Integrate with external systems via APIs, ensure mobile
+          responsiveness, and leverage analytics and machine learning for
+          actionable insights.
+        </p>
+        <div class="api-integration">
+          <h3>API Access & Integration</h3>
+          <form id="api-form">
+            <label for="api-key">API Key:</label>
+            <input
+              type="text"
+              id="api-key"
+              placeholder="Enter API Key"
+              required
+            />
+            <label for="api-endpoint">API Endpoint:</label>
+            <input
+              type="url"
+              id="api-endpoint"
+              placeholder="API Endpoint"
+              required
+            />
+            <button type="button" onclick="saveApiSettings()">
+              Save API Settings
+            </button>
+          </form>
+        </div>
+        <div class="mobile-responsive">
+          <h3>Mobile Responsiveness</h3>
+          <p>
+            This system is fully responsive and optimized for mobile access.
+          </p>
+        </div>
+        <div class="analytics-machine-learning">
+          <h3>Analytics & Machine Learning</h3>
+          <form id="analytics-form">
+            <label for="predictive-period"
+              >Predictive Analytics Period (days):</label
+            >
+            <input
+              type="number"
+              id="predictive-period"
+              placeholder="e.g., 30"
+              required
+            />
+            <button type="button" onclick="runPredictiveAnalytics()">
+              Run Analytics
+            </button>
+          </form>
+          <div id="custom-dashboard">
+            <h4>Customizable Dashboard</h4>
+            <p>
+              Build and save your personalized dashboard with key metrics and
+              KPIs.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      /* All functions below remain unchanged */
+      function logout() {
+        window.location.href = "login.html";
+      }
+      function addNewTransaction() {
+        alert("New transaction added!");
+      }
+      function viewCustomerTransactions() {
+        alert("Viewing customer transactions...");
+      }
+      function removeDuplicateTransactions() {
+        const tbody = document.getElementById("transactions-body");
+        const rows = Array.from(tbody.getElementsByTagName("tr"));
+        const seen = {};
+        rows.forEach((row) => {
+          const key = row.innerText.trim();
+          if (seen[key]) {
+            tbody.removeChild(row);
+          } else {
+            seen[key] = true;
+          }
+        });
+        alert("Duplicate transactions removed (if any).");
+      }
+      document
+        .getElementById("beneficiary-form")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+          const name = document.getElementById("beneficiary-name").value;
+          const contact = document.getElementById("beneficiary-contact").value;
+          const address = document.getElementById("beneficiary-address").value;
+          const eligibility =
+            document.getElementById("beneficiary-status").value;
+          const disbursement = document.getElementById(
+            "disbursement-status"
+          ).value;
+          const tbody = document.getElementById("beneficiary-body");
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+          <td>${name}</td>
+          <td>${contact}</td>
+          <td>${address}</td>
+          <td>${eligibility}</td>
+          <td>${disbursement}</td>
+          <td>
+            <button onclick="editBeneficiary(this)">Edit</button>
+            <button onclick="deleteBeneficiary(this)">Delete</button>
+          </td>
+        `;
+          tbody.appendChild(tr);
+          document.getElementById("beneficiary-form").reset();
+          alert("Beneficiary added successfully!");
+        });
+      function editBeneficiary(btn) {
+        const row = btn.parentNode.parentNode;
+        alert(
+          "Edit functionality not implemented for: " + row.cells[0].innerText
+        );
+      }
+      function deleteBeneficiary(btn) {
+        const row = btn.parentNode.parentNode;
+        row.parentNode.removeChild(row);
+        alert("Beneficiary removed successfully!");
+      }
+      document
+        .getElementById("report-form")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+          const startDate = document.getElementById("report-start-date").value;
+          const endDate = document.getElementById("report-end-date").value;
+          const reportType = document.getElementById("report-type").value;
+          const reportBody = document.querySelector("#report-table tbody");
+          reportBody.innerHTML = "";
+          const dummyData = [
+            {
+              date: "2025-02-15",
+              desc: "Sample Transaction 1",
+              amount: "$500.00",
+              type: reportType,
+            },
+            {
+              date: "2025-02-16",
+              desc: "Sample Transaction 2",
+              amount: "$300.00",
+              type: reportType,
+            },
+          ];
+          dummyData.forEach((item) => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `<td>${item.date}</td><td>${item.desc}</td><td>${item.amount}</td><td>${item.type}</td>`;
+            reportBody.appendChild(tr);
+          });
+          document.getElementById("total-income").innerText = "$5,000.00";
+          document.getElementById("total-expense").innerText = "$2,000.00";
+          document.getElementById("net-profit").innerText = "$3,000.00";
+          alert(
+            "Report generated for " +
+              startDate +
+              " to " +
+              endDate +
+              " (" +
+              reportType +
+              ")"
+          );
+          updateChart();
+        });
+      function exportReport() {
+        const rows = document.querySelectorAll("#report-table tr");
+        let csvContent = "";
+        rows.forEach((row) => {
+          const cols = row.querySelectorAll("td, th");
+          const rowData = [];
+          cols.forEach((col) => {
+            rowData.push(col.innerText);
+          });
+          csvContent += rowData.join(",") + "\n";
+        });
+        const blob = new Blob([csvContent], { type: "text/csv" });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.setAttribute("hidden", "");
+        a.setAttribute("href", url);
+        a.setAttribute("download", "financial_report.csv");
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      }
+      function applyFilters() {
+        alert("Advanced filters applied!");
+      }
+      let chart;
+      function updateChart() {
+        const ctx = document.getElementById("reportChart").getContext("2d");
+        const data = {
+          labels: ["Feb 15", "Feb 16", "Feb 17", "Feb 18"],
+          datasets: [
+            {
+              label: "Income",
+              data: [500, 700, 400, 600],
+              backgroundColor: "rgba(23, 195, 178, 0.6)",
+            },
+            {
+              label: "Expense",
+              data: [200, 300, 150, 250],
+              backgroundColor: "rgba(255, 99, 132, 0.6)",
+            },
+          ],
+        };
+        if (chart) {
+          chart.destroy();
+        }
+        chart = new Chart(ctx, {
+          type: "bar",
+          data: data,
+          options: {
+            responsive: true,
+            scales: {
+              y: { beginAtZero: true },
+            },
+          },
+        });
+      }
+      window.onload = function () {
+        updateChart();
+      };
+      document
+        .getElementById("user-form")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+          const name = document.getElementById("user-name").value;
+          const email = document.getElementById("user-email").value;
+          const role = document.getElementById("user-role").value;
+          const tier = document.getElementById("user-tier").value;
+          const status = document.getElementById("user-status").value;
+          const tableBody = document.querySelector("#users-table tbody");
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+          <td>${name}</td>
+          <td>${email}</td>
+          <td>${role}</td>
+          <td>${tier}</td>
+          <td>${status}</td>
+          <td>
+            <button onclick="editUser(this)">Edit</button>
+            <button onclick="deleteUser(this)">Delete</button>
+          </td>
+        `;
+          tableBody.appendChild(tr);
+          document.getElementById("user-form").reset();
+          alert("User added successfully!");
+        });
+      function editUser(btn) {
+        const row = btn.parentNode.parentNode;
+        alert(
+          "Edit functionality not implemented for user: " +
+            row.cells[0].innerText
+        );
+      }
+      function deleteUser(btn) {
+        const row = btn.parentNode.parentNode;
+        row.parentNode.removeChild(row);
+        alert("User deleted successfully!");
+      }
+      document
+        .getElementById("tier-form")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+          const tierName = document.getElementById("tier-name").value;
+          const tierPrice = document.getElementById("tier-price").value;
+          const tierFeatures = document.getElementById("tier-features").value;
+          const tableBody = document.querySelector("#tiers-table tbody");
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+          <td>${tierName}</td>
+          <td>$${tierPrice}</td>
+          <td>${tierFeatures}</td>
+          <td>
+            <button onclick="editTier(this)">Edit</button>
+            <button onclick="deleteTier(this)">Delete</button>
+          </td>
+        `;
+          tableBody.appendChild(tr);
+          document.getElementById("tier-form").reset();
+          alert("Subscription tier added successfully!");
+        });
+      function editTier(btn) {
+        const row = btn.parentNode.parentNode;
+        alert(
+          "Edit functionality not implemented for tier: " +
+            row.cells[0].innerText
+        );
+      }
+      function deleteTier(btn) {
+        const row = btn.parentNode.parentNode;
+        row.parentNode.removeChild(row);
+        alert("Subscription tier deleted successfully!");
+      }
+      document
+        .getElementById("org-form")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+          const dept = document.getElementById("department-name").value;
+          const team = document.getElementById("team-name").value;
+          const manager = document.getElementById("manager-name").value;
+          const tableBody = document.querySelector("#org-table tbody");
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+          <td>${dept}</td>
+          <td>${team}</td>
+          <td>${manager}</td>
+          <td>
+            <button onclick="editOrg(this)">Edit</button>
+            <button onclick="deleteOrg(this)">Delete</button>
+          </td>
+        `;
+          tableBody.appendChild(tr);
+          document.getElementById("org-form").reset();
+          alert("Organization unit added successfully!");
+        });
+      function editOrg(btn) {
+        const row = btn.parentNode.parentNode;
+        alert(
+          "Edit functionality not implemented for: " + row.cells[0].innerText
+        );
+      }
+      function deleteOrg(btn) {
+        const row = btn.parentNode.parentNode;
+        row.parentNode.removeChild(row);
+        alert("Organization unit removed successfully!");
+      }
+      document
+        .getElementById("profile-form")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+          const name = document.getElementById("profile-name").value;
+          const contact = document.getElementById("profile-contact").value;
+          const cert = document.getElementById("profile-cert").value;
+          const tableBody = document.querySelector("#profiles-table tbody");
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+          <td>${name}</td>
+          <td>${contact}</td>
+          <td>Uploaded</td>
+          <td>${cert}</td>
+          <td>
+            <button onclick="editProfile(this)">Edit</button>
+            <button onclick="deleteProfile(this)">Delete</button>
+          </td>
+        `;
+          tableBody.appendChild(tr);
+          document.getElementById("profile-form").reset();
+          alert("Profile registered successfully!");
+        });
+      function editProfile(btn) {
+        const row = btn.parentNode.parentNode;
+        alert(
+          "Edit functionality not implemented for profile: " +
+            row.cells[0].innerText
+        );
+      }
+      function deleteProfile(btn) {
+        const row = btn.parentNode.parentNode;
+        row.parentNode.removeChild(row);
+        alert("Profile deleted successfully!");
+      }
+      document
+        .getElementById("liabilities-form")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+          alert("Liability added (dummy function)!");
+          document.getElementById("liabilities-form").reset();
+        });
+      document
+        .getElementById("assets-form")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+          alert("Asset added (dummy function)!");
+          document.getElementById("assets-form").reset();
+        });
+      document
+        .getElementById("payment-form")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+          alert("Payment processed (dummy function)!");
+          document.getElementById("payment-form").reset();
+        });
+      function saveSecuritySettings() {
+        alert("Security settings saved!");
+      }
+      function saveNotificationSettings() {
+        alert("Notification settings saved!");
+      }
+      function saveApiSettings() {
+        alert("API settings saved!");
+      }
+      function runPredictiveAnalytics() {
+        alert("Predictive analytics executed (dummy function)!");
+      }
+      let chart;
+      function updateChart() {
+        const ctx = document.getElementById("reportChart").getContext("2d");
+        const data = {
+          labels: ["Feb 15", "Feb 16", "Feb 17", "Feb 18"],
+          datasets: [
+            {
+              label: "Income",
+              data: [500, 700, 400, 600],
+              backgroundColor: "rgba(23, 195, 178, 0.6)",
+            },
+            {
+              label: "Expense",
+              data: [200, 300, 150, 250],
+              backgroundColor: "rgba(255, 99, 132, 0.6)",
+            },
+          ],
+        };
+        if (chart) {
+          chart.destroy();
+        }
+        chart = new Chart(ctx, {
+          type: "bar",
+          data: data,
+          options: {
+            responsive: true,
+            scales: {
+              y: { beginAtZero: true },
+            },
+          },
+        });
+      }
+      window.onload = function () {
+        updateChart();
+      };
+    </script>
+  </body>
+</html>

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login Form</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-color: #f4f4f4;
+      }
+
+      .form {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        max-width: 350px;
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 20px;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .title {
+        font-size: 28px;
+        color: royalblue;
+        font-weight: 600;
+        letter-spacing: -1px;
+        text-align: center;
+      }
+
+      .message,
+      .signup {
+        color: rgba(88, 87, 87, 0.822);
+        font-size: 14px;
+        text-align: center;
+      }
+
+      .signup a {
+        color: royalblue;
+        text-decoration: none;
+      }
+
+      .signup a:hover {
+        text-decoration: underline;
+      }
+
+      .form label {
+        position: relative;
+        width: 100%;
+      }
+
+      .form label .input {
+        width: 100%;
+        padding: 10px;
+        outline: none;
+        border: 1px solid rgba(105, 105, 105, 0.397);
+        border-radius: 10px;
+      }
+
+      .form label .input + span {
+        position: absolute;
+        left: 10px;
+        top: 15px;
+        color: grey;
+        font-size: 0.9em;
+        transition: 0.3s ease;
+      }
+
+      .form label .input:focus + span,
+      .form label .input:valid + span {
+        top: 30px;
+        font-size: 0.7em;
+        font-weight: 600;
+      }
+
+      .submit {
+        border: none;
+        background-color: royalblue;
+        padding: 10px;
+        border-radius: 10px;
+        color: #fff;
+        font-size: 16px;
+        cursor: pointer;
+        text-align: center;
+      }
+
+      .submit:hover {
+        background-color: rgb(56, 90, 194);
+      }
+    </style>
+  </head>
+  <body>
+    <form
+      class="form"
+      onsubmit="event.preventDefault(); window.location.href='index.html';"
+    >
+      <p class="title">Login</p>
+      <p class="message">Welcome back! Please login to your account.</p>
+      <label>
+        <input required placeholder="" type="email" class="input" />
+        <span>Gmail</span>
+      </label>
+      <label>
+        <input required placeholder="" type="password" class="input" />
+        <span>Password</span>
+      </label>
+      <button class="submit" type="submit">Login</button>
+      <p class="signup">
+        Don't have an account? <a href="signup.html">Sign up</a>
+      </p>
+    </form>
+  </body>
+</html>

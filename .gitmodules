@@ -1,0 +1,3 @@
+[submodule "Manage"]
+	path = Manage
+	url = https://github.com/Kassim-gif/Manage.git

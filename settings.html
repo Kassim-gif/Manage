@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Settings - Admin Panel - Zakat Mirath Ease</title>
+
+    <!-- Montserrat Font -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Material Icons -->
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined"
+      rel="stylesheet"
+    />
+    <!-- Chart.js (included for consistency) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Dummy financeManager.js content -->
+    <script>
+      console.log("Dummy financeManager.js loaded.");
+    </script>
+
+    <style>
+      /* Global Styles */
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background: #f4f4f4;
+      }
+      /* Sidebar Styling using CSS transform for sliding effect */
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 200px;
+        height: 100%;
+        background: #ffffff;
+        transform: translateX(-200px);
+        transition: transform 0.3s ease;
+        padding-top: 60px;
+        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+      }
+      .sidebar.active {
+        transform: translateX(0);
+      }
+      .sidebar ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+      .sidebar ul li {
+        padding: 8px 10px;
+      }
+      .sidebar ul li a {
+        color: #000;
+        text-decoration: none;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+      }
+      .material-icons-outlined {
+        font-size: 16px;
+        line-height: 1;
+      }
+      .sidebar ul li button {
+        width: 100%;
+        background: transparent;
+        border: none;
+        padding: 0;
+        cursor: pointer;
+      }
+      /* Button Base Style */
+      button {
+        padding: 0.8em 1.8em;
+        border: 2px solid #17c3b2;
+        position: relative;
+        overflow: hidden;
+        background-color: transparent;
+        text-align: center;
+        text-transform: uppercase;
+        font-size: 16px;
+        transition: 0.3s;
+        z-index: 1;
+        font-family: inherit;
+        color: #17c3b2;
+        cursor: pointer;
+      }
+      button::before {
+        content: "";
+        width: 0;
+        height: 300%;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) rotate(45deg);
+        background: #17c3b2;
+        transition: 0.5s ease;
+        display: block;
+        z-index: -1;
+      }
+      button:hover::before {
+        width: 105%;
+      }
+      button:hover {
+        color: #111;
+      }
+      /* Burger Button (Menu Button) */
+      .btn {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        width: 50px;
+        height: 50px;
+        background: #ffffff;
+        border: none;
+        cursor: pointer;
+        z-index: 1100;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 5px;
+        box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+      }
+      .icon svg rect {
+        fill: #000;
+      }
+      /* Header Styling */
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+      .header-left,
+      .header-right {
+        display: flex;
+        gap: 10px;
+      }
+      /* Dashboard Overview Cards */
+      .cards {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .card {
+        background: #80ffff;
+        padding: 15px;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        flex: 1;
+        min-width: 180px;
+        text-align: center;
+      }
+      /* Section Common Styles */
+      .section {
+        background: #fff;
+        padding: 20px;
+        margin-top: 20px;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      .section h2 {
+        margin-top: 0;
+      }
+      form,
+      .add-form {
+        margin-bottom: 20px;
+      }
+      form input,
+      form select,
+      form button,
+      .add-form input,
+      .add-form select,
+      .add-form button {
+        padding: 8px;
+        margin: 5px 10px 5px 0;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+      }
+      form button,
+      .add-form button {
+        background: #80ff80;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+      }
+      th,
+      td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+      }
+      th {
+        background: #80ff80;
+        color: #fff;
+      }
+      /* Settings Page Specific Styles */
+      .settings-section {
+        margin-bottom: 20px;
+      }
+      .settings-section h3 {
+        margin-top: 0;
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 5px;
+      }
+      .settings-form label {
+        display: block;
+        margin: 10px 0 5px;
+        font-weight: bold;
+      }
+      .settings-form input,
+      .settings-form select {
+        padding: 6px;
+        width: 100%;
+        max-width: 400px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+      }
+      .settings-form button {
+        margin-top: 10px;
+      }
+      /* Main Dashboard Layout */
+      .dashboard {
+        max-width: 1200px;
+        margin: 20px auto;
+        padding: 20px;
+        transition: margin-left 0.3s;
+      }
+      .sidebar.active ~ .dashboard {
+        margin-left: 200px;
+      }
+      /* Charts (if needed) */
+      .charts-container {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+        padding-top: 60px;
+      }
+      .chart-card {
+        background: #fff;
+        padding: 15px;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      .chart-title {
+        margin-bottom: 10px;
+        font-size: 16px;
+        text-align: center;
+      }
+      .chart-container {
+        width: 300px;
+        height: 150px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Menu with Sidebar Toggle Button -->
+    <div class="menu">
+      <!-- Inline onclick to add the active class to the sidebar -->
+      <button
+        class="btn"
+        onclick="document.getElementById('sidebar').classList.add('active');"
+      >
+        <span class="icon">
+          <svg viewBox="0 0 175 80" width="40" height="40">
+            <rect width="80" height="15" rx="10"></rect>
+            <rect y="30" width="80" height="15" rx="10"></rect>
+            <rect y="60" width="80" height="15" rx="10"></rect>
+          </svg>
+        </span>
+      </button>
+    </div>
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="sidebar">
+      <div class="sidebar-title">
+        <!-- Inline onclick to remove the active class -->
+        <span
+          class="material-icons-outlined"
+          onclick="document.getElementById('sidebar').classList.remove('active');"
+        >
+          close
+        </span>
+      </div>
+      <ul class="sidebar-list">
+        <li class="sidebar-list-item">
+          <a href="index.html" target="_blank">
+            <span class="material-icons-outlined">dashboard</span> Dashboard
+          </a>
+        </li>
+        <li class="sidebar-list-item">
+          <a href="services.html" target="_blank">
+            <span class="material-icons-outlined">inventory_2</span> Services
+          </a>
+        </li>
+        <li class="sidebar-list-item">
+          <a href="#" target="_blank">
+            <span class="material-icons-outlined">category</span> Categories
+          </a>
+        </li>
+        <li class="sidebar-list-item">
+          <a href="admin.html" target="_blank">
+            <span class="material-icons-outlined">groups</span> Admins
+          </a>
+        </li>
+        <li class="sidebar-list-item">
+          <a href="charts.html" target="_blank">
+            <span class="material-icons-outlined">fact_check</span> Charts
+          </a>
+        </li>
+        <li class="sidebar-list-item">
+          <a href="reports.html" target="_blank">
+            <span class="material-icons-outlined">poll</span> Reports
+          </a>
+        </li>
+        <li class="sidebar-list-item">
+          <a href="settings.html" target="_blank">
+            <span class="material-icons-outlined">settings</span> Settings
+          </a>
+        </li>
+        <li class="sidebar-list-item">
+          <button
+            class="logout-btn"
+            onclick="window.location.href='login.html';"
+          >
+            Log out
+          </button>
+        </li>
+      </ul>
+    </aside>
+
+    <!-- Main Dashboard Content (Settings Page) -->
+    <div class="dashboard">
+      <header class="header">
+        <div class="header-left">
+          <span class="material-icons-outlined">search</span>
+        </div>
+        <div class="header-right">
+          <span class="material-icons-outlined">notifications</span>
+          <span class="material-icons-outlined">email</span>
+          <span class="material-icons-outlined">account_circle</span>
+        </div>
+      </header>
+      <h1 style="text-align: center">Settings - Zakat Mirath Ease</h1>
+
+      <!-- Settings Section: General Settings -->
+      <div class="section settings-section">
+        <h2>General Settings</h2>
+        <form class="settings-form" id="generalSettingsForm">
+          <label for="site-title">Site Title:</label>
+          <input
+            type="text"
+            id="site-title"
+            placeholder="Enter site title"
+            required
+          />
+
+          <label for="site-logo">Site Logo (URL):</label>
+          <input
+            type="url"
+            id="site-logo"
+            placeholder="Enter logo URL"
+            required
+          />
+
+          <label for="timezone">Timezone:</label>
+          <select id="timezone">
+            <option value="UTC">UTC</option>
+            <option value="EST">EST</option>
+            <option value="PST">PST</option>
+            <!-- Additional options as needed -->
+          </select>
+          <button type="button" onclick="saveGeneralSettings()">
+            Save General Settings
+          </button>
+        </form>
+      </div>
+
+      <!-- Settings Section: Notification Settings -->
+      <div class="section settings-section">
+        <h2>Notification Settings</h2>
+        <form class="settings-form" id="notificationSettingsForm">
+          <label for="email-notifications">Email Notifications:</label>
+          <select id="email-notifications">
+            <option value="Enabled">Enabled</option>
+            <option value="Disabled">Disabled</option>
+          </select>
+
+          <label for="sms-notifications">SMS Notifications:</label>
+          <select id="sms-notifications">
+            <option value="Enabled">Enabled</option>
+            <option value="Disabled">Disabled</option>
+          </select>
+          <button type="button" onclick="saveNotificationSettings()">
+            Save Notification Settings
+          </button>
+        </form>
+      </div>
+
+      <!-- Settings Section: Security Settings -->
+      <div class="section settings-section">
+        <h2>Security Settings</h2>
+        <form class="settings-form" id="securitySettingsForm">
+          <label for="mfa-setting"
+            >Enable Multi-Factor Authentication (MFA):</label
+          >
+          <select id="mfa-setting">
+            <option value="Enabled">Enabled</option>
+            <option value="Disabled">Disabled</option>
+          </select>
+
+          <label for="password-policy">Password Policy:</label>
+          <select id="password-policy">
+            <option value="Strong">Strong</option>
+            <option value="Moderate">Moderate</option>
+            <option value="Weak">Weak</option>
+          </select>
+          <button type="button" onclick="saveSecuritySettings()">
+            Save Security Settings
+          </button>
+        </form>
+      </div>
+
+      <!-- Settings Section: Integration Settings -->
+      <div class="section settings-section">
+        <h2>Integration Settings</h2>
+        <form class="settings-form" id="integrationSettingsForm">
+          <label for="crm-api">CRM API Endpoint:</label>
+          <input
+            type="url"
+            id="crm-api"
+            placeholder="Enter CRM API endpoint"
+            required
+          />
+
+          <label for="hr-api">HR System API Endpoint:</label>
+          <input
+            type="url"
+            id="hr-api"
+            placeholder="Enter HR System API endpoint"
+            required
+          />
+          <button type="button" onclick="saveIntegrationSettings()">
+            Save Integration Settings
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      // Settings Functions
+      function saveGeneralSettings() {
+        const siteTitle = document.getElementById("site-title").value;
+        const siteLogo = document.getElementById("site-logo").value;
+        const timezone = document.getElementById("timezone").value;
+        alert(
+          "General Settings Saved:\nSite Title: " +
+            siteTitle +
+            "\nSite Logo: " +
+            siteLogo +
+            "\nTimezone: " +
+            timezone
+        );
+      }
+      function saveNotificationSettings() {
+        const emailNotif = document.getElementById("email-notifications").value;
+        const smsNotif = document.getElementById("sms-notifications").value;
+        alert(
+          "Notification Settings Saved:\nEmail: " +
+            emailNotif +
+            "\nSMS: " +
+            smsNotif
+        );
+      }
+      function saveSecuritySettings() {
+        const mfaSetting = document.getElementById("mfa-setting").value;
+        const passwordPolicy = document.getElementById("password-policy").value;
+        alert(
+          "Security Settings Saved:\nMFA: " +
+            mfaSetting +
+            "\nPassword Policy: " +
+            passwordPolicy
+        );
+      }
+      function saveIntegrationSettings() {
+        const crmApi = document.getElementById("crm-api").value;
+        const hrApi = document.getElementById("hr-api").value;
+        alert(
+          "Integration Settings Saved:\nCRM API: " +
+            crmApi +
+            "\nHR API: " +
+            hrApi
+        );
+      }
+
+      /* The rest of the functions (transactions, beneficiaries, reporting, user management, etc.)
+         remain the same as in the other pages. */
+      function logout() {
+        window.location.href = "login.html";
+      }
+      function addNewTransaction() {
+        alert("New transaction added!");
+      }
+      function viewCustomerTransactions() {
+        alert("Viewing customer transactions...");
+      }
+      function removeDuplicateTransactions() {
+        const tbody = document.getElementById("transactions-body");
+        const rows = Array.from(tbody.getElementsByTagName("tr"));
+        const seen = {};
+        rows.forEach((row) => {
+          const key = row.innerText.trim();
+          if (seen[key]) {
+            tbody.removeChild(row);
+          } else {
+            seen[key] = true;
+          }
+        });
+        alert("Duplicate transactions removed (if any).");
+      }
+      document
+        .getElementById("beneficiary-form")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+          const name = document.getElementById("beneficiary-name").value;
+          const contact = document.getElementById("beneficiary-contact").value;
+          const address = document.getElementById("beneficiary-address").value;
+          const eligibility =
+            document.getElementById("beneficiary-status").value;
+          const disbursement = document.getElementById(
+            "disbursement-status"
+          ).value;
+          const tbody = document.getElementById("beneficiary-body");
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+          <td>${name}</td>
+          <td>${contact}</td>
+          <td>${address}</td>
+          <td>${eligibility}</td>
+          <td>${disbursement}</td>
+          <td>
+            <button onclick="editBeneficiary(this)">Edit</button>
+            <button onclick="deleteBeneficiary(this)">Delete</button>
+          </td>
+        `;
+          tbody.appendChild(tr);
+          document.getElementById("beneficiary-form").reset();
+          alert("Beneficiary added successfully!");
+        });
+      function editBeneficiary(btn) {
+        const row = btn.parentNode.parentNode;
+        alert(
+          "Edit functionality not implemented for: " + row.cells[0].innerText
+        );
+      }
+      function deleteBeneficiary(btn) {
+        const row = btn.parentNode.parentNode;
+        row.parentNode.removeChild(row);
+        alert("Beneficiary removed successfully!");
+      }
+      document
+        .getElementById("report-form")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+          const startDate = document.getElementById("report-start-date").value;
+          const endDate = document.getElementById("report-end-date").value;
+          const reportType = document.getElementById("report-type").value;
+          const reportBody = document.querySelector("#report-table tbody");
+          reportBody.innerHTML = "";
+          const dummyData = [
+            {
+              date: "2025-02-15",
+              desc: "Sample Transaction 1",
+              amount: "$500.00",
+              type: reportType,
+            },
+            {
+              date: "2025-02-16",
+              desc: "Sample Transaction 2",
+              amount: "$300.00",
+              type: reportType,
+            },
+          ];
+          dummyData.forEach((item) => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `<td>${item.date}</td><td>${item.desc}</td><td>${item.amount}</td><td>${item.type}</td>`;
+            reportBody.appendChild(tr);
+          });
+          document.getElementById("total-income").innerText = "$5,000.00";
+          document.getElementById("total-expense").innerText = "$2,000.00";
+          document.getElementById("net-profit").innerText = "$3,000.00";
+          alert(
+            "Report generated for " +
+              startDate +
+              " to " +
+              endDate +
+              " (" +
+              reportType +
+              ")"
+          );
+          updateChart();
+        });
+      function exportReport() {
+        const rows = document.querySelectorAll("#report-table tr");
+        let csvContent = "";
+        rows.forEach((row) => {
+          const cols = row.querySelectorAll("td, th");
+          const rowData = [];
+          cols.forEach((col) => {
+            rowData.push(col.innerText);
+          });
+          csvContent += rowData.join(",") + "\n";
+        });
+        const blob = new Blob([csvContent], { type: "text/csv" });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.setAttribute("hidden", "");
+        a.setAttribute("href", url);
+        a.setAttribute("download", "financial_report.csv");
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      }
+      function applyFilters() {
+        alert("Advanced filters applied!");
+      }
+      let chart;
+      function updateChart() {
+        const ctx = document.getElementById("reportChart").getContext("2d");
+        const data = {
+          labels: ["Feb 15", "Feb 16", "Feb 17", "Feb 18"],
+          datasets: [
+            {
+              label: "Income",
+              data: [500, 700, 400, 600],
+              backgroundColor: "rgba(23, 195, 178, 0.6)",
+            },
+            {
+              label: "Expense",
+              data: [200, 300, 150, 250],
+              backgroundColor: "rgba(255, 99, 132, 0.6)",
+            },
+          ],
+        };
+        if (chart) {
+          chart.destroy();
+        }
+        chart = new Chart(ctx, {
+          type: "bar",
+          data: data,
+          options: {
+            responsive: true,
+            scales: {
+              y: { beginAtZero: true },
+            },
+          },
+        });
+      }
+      window.onload = function () {
+        updateChart();
+      };
+      document
+        .getElementById("user-form")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+          const name = document.getElementById("user-name").value;
+          const email = document.getElementById("user-email").value;
+          const role = document.getElementById("user-role").value;
+          const tier = document.getElementById("user-tier").value;
+          const status = document.getElementById("user-status").value;
+          const tableBody = document.querySelector("#users-table tbody");
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+          <td>${name}</td>
+          <td>${email}</td>
+          <td>${role}</td>
+          <td>${tier}</td>
+          <td>${status}</td>
+          <td>
+            <button onclick="editUser(this)">Edit</button>
+            <button onclick="deleteUser(this)">Delete</button>
+          </td>
+        `;
+          tableBody.appendChild(tr);
+          document.getElementById("user-form").reset();
+          alert("User added successfully!");
+        });
+      function editUser(btn) {
+        const row = btn.parentNode.parentNode;
+        alert(
+          "Edit functionality not implemented for user: " +
+            row.cells[0].innerText
+        );
+      }
+      function deleteUser(btn) {
+        const row = btn.parentNode.parentNode;
+        row.parentNode.removeChild(row);
+        alert("User deleted successfully!");
+      }
+      document
+        .getElementById("tier-form")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+          const tierName = document.getElementById("tier-name").value;
+          const tierPrice = document.getElementById("tier-price").value;
+          const tierFeatures = document.getElementById("tier-features").value;
+          const tableBody = document.querySelector("#tiers-table tbody");
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+          <td>${tierName}</td>
+          <td>$${tierPrice}</td>
+          <td>${tierFeatures}</td>
+          <td>
+            <button onclick="editTier(this)">Edit</button>
+            <button onclick="deleteTier(this)">Delete</button>
+          </td>
+        `;
+          tableBody.appendChild(tr);
+          document.getElementById("tier-form").reset();
+          alert("Subscription tier added successfully!");
+        });
+      function editTier(btn) {
+        const row = btn.parentNode.parentNode;
+        alert(
+          "Edit functionality not implemented for tier: " +
+            row.cells[0].innerText
+        );
+      }
+      function deleteTier(btn) {
+        const row = btn.parentNode.parentNode;
+        row.parentNode.removeChild(row);
+        alert("Subscription tier deleted successfully!");
+      }
+      document
+        .getElementById("org-form")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+          const dept = document.getElementById("department-name").value;
+          const team = document.getElementById("team-name").value;
+          const manager = document.getElementById("manager-name").value;
+          const tableBody = document.querySelector("#org-table tbody");
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+          <td>${dept}</td>
+          <td>${team}</td>
+          <td>${manager}</td>
+          <td>
+            <button onclick="editOrg(this)">Edit</button>
+            <button onclick="deleteOrg(this)">Delete</button>
+          </td>
+        `;
+          tableBody.appendChild(tr);
+          document.getElementById("org-form").reset();
+          alert("Organization unit added successfully!");
+        });
+      function editOrg(btn) {
+        const row = btn.parentNode.parentNode;
+        alert(
+          "Edit functionality not implemented for: " + row.cells[0].innerText
+        );
+      }
+      function deleteOrg(btn) {
+        const row = btn.parentNode.parentNode;
+        row.parentNode.removeChild(row);
+        alert("Organization unit removed successfully!");
+      }
+      document
+        .getElementById("profile-form")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+          const name = document.getElementById("profile-name").value;
+          const contact = document.getElementById("profile-contact").value;
+          const cert = document.getElementById("profile-cert").value;
+          const tableBody = document.querySelector("#profiles-table tbody");
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+          <td>${name}</td>
+          <td>${contact}</td>
+          <td>Uploaded</td>
+          <td>${cert}</td>
+          <td>
+            <button onclick="editProfile(this)">Edit</button>
+            <button onclick="deleteProfile(this)">Delete</button>
+          </td>
+        `;
+          tableBody.appendChild(tr);
+          document.getElementById("profile-form").reset();
+          alert("Profile registered successfully!");
+        });
+      function editProfile(btn) {
+        const row = btn.parentNode.parentNode;
+        alert(
+          "Edit functionality not implemented for profile: " +
+            row.cells[0].innerText
+        );
+      }
+      function deleteProfile(btn) {
+        const row = btn.parentNode.parentNode;
+        row.parentNode.removeChild(row);
+        alert("Profile deleted successfully!");
+      }
+      document
+        .getElementById("liabilities-form")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+          alert("Liability added (dummy function)!");
+          document.getElementById("liabilities-form").reset();
+        });
+      document
+        .getElementById("assets-form")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+          alert("Asset added (dummy function)!");
+          document.getElementById("assets-form").reset();
+        });
+      document
+        .getElementById("payment-form")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+          alert("Payment processed (dummy function)!");
+          document.getElementById("payment-form").reset();
+        });
+    </script>
+  </body>
+</html>

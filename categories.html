@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Services & Subscription Management - Zakat Mirath Ease</title>
+    <!-- External CSS if needed -->
+    <link rel="stylesheet" href="style.css" />
+    <!-- Montserrat Font -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Material Icons -->
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined"
+      rel="stylesheet"
+    />
+    <!-- Chart.js CDN (for consistency) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Dummy financeManager.js -->
+    <script>
+      console.log("Dummy financeManager.js loaded.");
+    </script>
+    <style>
+      /* Global Styles */
+      body {
+        font-family: "Montserrat", sans-serif;
+        margin: 0;
+        padding: 0;
+        background: #f4f4f4;
+      }
+      /* Sidebar Styling (250px wide as in the chart file) */
+      .sidebar {
+        position: fixed;
+        left: -250px;
+        top: 0;
+        width: 250px;
+        height: 100%;
+        background: #ffffff;
+        transition: 0.3s;
+        padding-top: 60px;
+        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+      }
+      .sidebar.active {
+        left: 0;
+      }
+      .sidebar ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+      .sidebar ul li {
+        padding: 15px;
+      }
+      .sidebar ul li a {
+        color: #000;
+        text-decoration: none;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+      .sidebar ul li button {
+        width: 100%;
+        background: transparent;
+        border: none;
+        padding: 0;
+        cursor: pointer;
+      }
+      /* Burger Button (Menu Button) */
+      .btn {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        width: 50px;
+        height: 50px;
+        background: #ffffff;
+        border: none;
+        cursor: pointer;
+        z-index: 1100;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 5px;
+        box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+      }
+      .icon svg rect {
+        fill: #000;
+      }
+      /* Header */
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+      .header-left,
+      .header-right {
+        display: flex;
+        gap: 10px;
+      }
+      /* Tables */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        background: #fff;
+        border-radius: 5px;
+        overflow: hidden;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      table th,
+      table td {
+        padding: 12px 15px;
+        border: 1px solid #ddd;
+        text-align: left;
+      }
+      table th {
+        background: #80ffff;
+        color: #fff;
+      }
+      /* Form Groups */
+      .form-group {
+        margin-bottom: 15px;
+      }
+      .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+      }
+      .form-group input,
+      .form-group select {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+      }
+      .form-group button {
+        margin-top: 10px;
+        padding: 10px 20px;
+        background: #80ff80;
+        border: none;
+        border-radius: 4px;
+        color: #fff;
+        cursor: pointer;
+      }
+      /* Main Content Layout */
+      .dashboard {
+        max-width: 1200px;
+        margin: 20px auto;
+        padding: 20px;
+        transition: margin-left 0.3s;
+      }
+      .sidebar.active ~ .dashboard {
+        margin-left: 250px;
+      }
+      /* Section Spacing */
+      .section {
+        margin-bottom: 40px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Menu with Sidebar Toggle Button -->
+    <div class="menu">
+      <button
+        class="btn"
+        onclick="document.getElementById('sidebar').classList.add('active');"
+      >
+        <span class="icon">
+          <svg viewBox="0 0 175 80" width="40" height="40">
+            <rect width="80" height="15" rx="10"></rect>
+            <rect y="30" width="80" height="15" rx="10"></rect>
+            <rect y="60" width="80" height="15" rx="10"></rect>
+          </svg>
+        </span>
+      </button>
+    </div>
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="sidebar">
+      <div class="sidebar-title">
+        <span
+          class="material-icons-outlined"
+          onclick="document.getElementById('sidebar').classList.remove('active');"
+        >
+          close
+        </span>
+      </div>
+      <ul class="sidebar-list">
+        <li class="sidebar-list-item">
+          <a href="index.html" target="_blank">
+            <span class="material-icons-outlined">dashboard</span> Dashboard
+          </a>
+        </li>
+        <li class="sidebar-list-item">
+          <a href="services.html" target="_blank">
+            <span class="material-icons-outlined">inventory_2</span> Services
+          </a>
+        </li>
+        <li class="sidebar-list-item">
+          <a href="categories.html" target="_blank">
+            <span class="material-icons-outlined">category</span> Categories
+          </a>
+        </li>
+        <li class="sidebar-list-item">
+          <a href="admin.html" target="_blank">
+            <span class="material-icons-outlined">groups</span> Admins
+          </a>
+        </li>
+        <li class="sidebar-list-item">
+          <a href="charts.html" target="_blank">
+            <span class="material-icons-outlined">fact_check</span> Charts
+          </a>
+        </li>
+        <li class="sidebar-list-item">
+          <a href="reports.html" target="_blank">
+            <span class="material-icons-outlined">poll</span> Reports
+          </a>
+        </li>
+        <li class="sidebar-list-item">
+          <a href="settings.html" target="_blank">
+            <span class="material-icons-outlined">settings</span> Settings
+          </a>
+        </li>
+        <li class="sidebar-list-item">
+          <button class="logout-btn" onclick="logout()">Log out</button>
+        </li>
+      </ul>
+    </aside>
+
+    <!-- Main Dashboard Content -->
+    <div class="dashboard">
+      <header class="header">
+        <div class="header-left">
+          <span class="material-icons-outlined">search</span>
+        </div>
+        <div class="header-right">
+          <span class="material-icons-outlined">notifications</span>
+          <span class="material-icons-outlined">email</span>
+          <span class="material-icons-outlined">account_circle</span>
+        </div>
+      </header>
+      <h1 style="text-align: center">Services & Subscription Management</h1>
+
+      <!-- Role Selection for CBAC Demo -->
+      <div class="form-group">
+        <label for="user-role">Select Your Role:</label>
+        <select id="user-role" onchange="filterServicesByRole()">
+          <option value="Admin">Admin</option>
+          <option value="Premium">Premium</option>
+          <option value="Basic">Basic</option>
+        </select>
+      </div>
+
+      <!-- Services List Table -->
+      <h2>Services List</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Service Name</th>
+            <th>Description</th>
+            <th>Category</th>
+            <th>Required Access</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="services-table">
+          <!-- Each row includes a data-access attribute and a Delete button -->
+          <tr data-access="Basic">
+            <td>Standard Zakat Calculation</td>
+            <td>Basic computation service</td>
+            <td>Zakat</td>
+            <td>Basic</td>
+            <td>
+              <button onclick="deleteRow(this)">Delete</button>
+            </td>
+          </tr>
+          <tr data-access="Premium">
+            <td>Advanced Mirath Planning</td>
+            <td>Detailed planning for Mirath distribution</td>
+            <td>Mirath</td>
+            <td>Premium</td>
+            <td>
+              <button onclick="deleteRow(this)">Delete</button>
+            </td>
+          </tr>
+          <tr data-access="Admin">
+            <td>Audit Dashboard</td>
+            <td>Exclusive admin auditing tools</td>
+            <td>Analytics</td>
+            <td>Admin</td>
+            <td>
+              <button onclick="deleteRow(this)">Delete</button>
+            </td>
+          </tr>
+          <tr data-access="Premium">
+            <td>Premium Consulting</td>
+            <td>Personalized consultation services</td>
+            <td>Consulting</td>
+            <td>Premium</td>
+            <td>
+              <button onclick="deleteRow(this)">Delete</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Add New Service Form -->
+      <div class="section">
+        <h2>Add New Service</h2>
+        <div class="form-group">
+          <label for="service-name">Service Name:</label>
+          <input type="text" id="service-name" placeholder="Service Name" />
+        </div>
+        <div class="form-group">
+          <label for="service-description">Description:</label>
+          <input
+            type="text"
+            id="service-description"
+            placeholder="Service Description"
+          />
+        </div>
+        <div class="form-group">
+          <label for="service-category">Category:</label>
+          <select id="service-category">
+            <option value="Zakat">Zakat</option>
+            <option value="Mirath">Mirath</option>
+            <option value="Consulting">Consulting</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="service-access">Required Access:</label>
+          <select id="service-access">
+            <option value="Basic">Basic</option>
+            <option value="Premium">Premium</option>
+            <option value="Admin">Admin</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="service-icon">Icon URL:</label>
+          <input
+            type="url"
+            id="service-icon"
+            placeholder="Icon URL (optional)"
+          />
+        </div>
+        <div class="form-group">
+          <button onclick="addService()">Add Service</button>
+        </div>
+      </div>
+
+      <!-- Subscription Plans Management Section -->
+      <div class="section settings-section">
+        <h2>Subscription Plans Management</h2>
+        <!-- Overview Cards (Optional) -->
+        <div class="cards">
+          <div class="card">
+            <h3>Total Plans</h3>
+            <p>3</p>
+          </div>
+          <div class="card">
+            <h3>Active Plans</h3>
+            <p>3</p>
+          </div>
+          <div class="card">
+            <h3>Monthly Earnings</h3>
+            <p>$4,500</p>
+          </div>
+        </div>
+        <!-- Add/Edit Subscription Plan Form -->
+        <div class="add-form">
+          <h2>Add / Edit Subscription Plan</h2>
+          <div class="form-group">
+            <label for="plan-name">Plan Name:</label>
+            <input type="text" id="plan-name" placeholder="Plan Name" />
+          </div>
+          <div class="form-group">
+            <label for="plan-price">Plan Price ($):</label>
+            <input type="number" id="plan-price" placeholder="Plan Price" />
+          </div>
+          <div class="form-group">
+            <label for="plan-description">Plan Description:</label>
+            <input
+              type="text"
+              id="plan-description"
+              placeholder="Plan Description"
+            />
+          </div>
+          <div class="form-group">
+            <label for="plan-status">Plan Status:</label>
+            <select id="plan-status">
+              <option value="Active">Active</option>
+              <option value="Inactive">Inactive</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <button onclick="saveSubscriptionPlan()">Save Plan</button>
+          </div>
+        </div>
+        <!-- Subscription Plans Table -->
+        <h2>Existing Subscription Plans</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Plan Name</th>
+              <th>Price</th>
+              <th>Description</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="plans-body">
+            <tr>
+              <td>Premium</td>
+              <td>$49.99</td>
+              <td>All features unlocked</td>
+              <td>Active</td>
+              <td>
+                <button onclick="deleteRow(this)">Delete</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <script>
+      // Sidebar Functions
+      function toggleSidebar() {
+        document.getElementById("sidebar").classList.toggle("active");
+      }
+      function closeSidebar() {
+        document.getElementById("sidebar").classList.remove("active");
+      }
+      // Logout Function
+      function logout() {
+        window.location.href = "login.html";
+      }
+
+      // Delete a row function – works for both services and subscription plans
+      function deleteRow(btn) {
+        if (confirm("Are you sure you want to delete this entry?")) {
+          var row = btn.parentNode.parentNode;
+          row.parentNode.removeChild(row);
+        }
+      }
+
+      // Role-Based Access Control for Services
+      function filterServicesByRole() {
+        const role = document.getElementById("user-role").value;
+        const rows = document.querySelectorAll("#services-table tr");
+        rows.forEach((row) => {
+          const access = row.getAttribute("data-access");
+          // Admin sees all; Premium sees Premium & Basic; Basic sees only Basic.
+          if (role === "Admin") {
+            row.style.display = "";
+          } else if (role === "Premium") {
+            if (access === "Admin") {
+              row.style.display = "none";
+            } else {
+              row.style.display = "";
+            }
+          } else if (role === "Basic") {
+            row.style.display = access === "Basic" ? "" : "none";
+          }
+        });
+      }
+
+      // Function to add a new service
+      function addService() {
+        const name = document.getElementById("service-name").value;
+        const description = document.getElementById(
+          "service-description"
+        ).value;
+        const category = document.getElementById("service-category").value;
+        const access = document.getElementById("service-access").value;
+        const iconUrl =
+          document.getElementById("service-icon").value ||
+          "https://via.placeholder.com/30";
+        const tbody = document.getElementById("services-table");
+        const tr = document.createElement("tr");
+        tr.setAttribute("data-access", access);
+        tr.innerHTML = `
+          <td>${name}</td>
+          <td>${description}</td>
+          <td>${category}</td>
+          <td>${access}</td>
+          <td><img src="${iconUrl}" alt="Icon" /></td>
+          <td><button onclick="deleteRow(this)">Delete</button></td>
+        `;
+        tbody.appendChild(tr);
+        alert("Service added successfully!");
+      }
+
+      // Function to save a subscription plan
+      function saveSubscriptionPlan() {
+        const planName = document.getElementById("plan-name").value;
+        const planPrice = document.getElementById("plan-price").value;
+        const planDescription =
+          document.getElementById("plan-description").value;
+        const planStatus = document.getElementById("plan-status").value;
+        const tbody = document.getElementById("plans-body");
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${planName}</td>
+          <td>$${planPrice}</td>
+          <td>${planDescription}</td>
+          <td>${planStatus}</td>
+          <td><button onclick="deleteRow(this)">Delete</button></td>
+        `;
+        tbody.appendChild(tr);
+        alert("Subscription plan saved successfully!");
+      }
+    </script>
+    <script src="financeManager.js"></script>
+  </body>
+</html>

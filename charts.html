@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Finance Management Dashboard</title>
+
+    <!-- Montserrat Font -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Material Icons -->
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined"
+      rel="stylesheet"
+    />
+
+    <style>
+      /* Global Styles */
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background: #f4f4f4;
+      }
+
+      /* Sidebar Styling - updated to 250px wide */
+      .sidebar {
+        position: fixed;
+        left: -250px;
+        top: 0;
+        width: 250px;
+        height: 100%;
+        background: #ffffff;
+        transition: 0.3s;
+        padding-top: 60px;
+        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+      }
+      .sidebar.active {
+        left: 0;
+      }
+      .sidebar ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+      .sidebar ul li {
+        padding: 15px;
+      }
+      .sidebar ul li a {
+        color: #000;
+        text-decoration: none;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+      /* Ensure sidebar icons are uniformly sized and aligned */
+      .sidebar ul li a .material-icons-outlined {
+        font-size: 20px;
+        vertical-align: middle;
+      }
+      /* Logout Button Style - placed as a list item below Settings */
+      .sidebar ul li button {
+        width: 100%;
+        background: transparent;
+        border: none;
+        padding: 0;
+        cursor: pointer;
+      }
+
+      /* Button Style */
+      button {
+        padding: 0.8em 1.8em;
+        border: 2px solid #17c3b2;
+        position: relative;
+        overflow: hidden;
+        background-color: transparent;
+        text-align: center;
+        text-transform: uppercase;
+        font-size: 16px;
+        transition: 0.3s;
+        z-index: 1;
+        font-family: inherit;
+        color: #17c3b2;
+        cursor: pointer;
+      }
+      button::before {
+        content: "";
+        width: 0;
+        height: 300%;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) rotate(45deg);
+        background: #17c3b2;
+        transition: 0.5s ease;
+        display: block;
+        z-index: -1;
+      }
+      button:hover::before {
+        width: 105%;
+      }
+      button:hover {
+        color: #111;
+      }
+
+      /* Burger Button (Menu Button) */
+      .btn {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        width: 50px;
+        height: 50px;
+        background: #ffffff;
+        border: none;
+        cursor: pointer;
+        z-index: 1100;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 5px;
+        box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+      }
+      .icon svg rect {
+        fill: #000;
+      }
+
+      /* Header Styling */
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+      .header-left,
+      .header-right {
+        display: flex;
+        gap: 10px;
+      }
+
+      /* Dashboard Overview Cards */
+      .cards {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .card {
+        background: #80ffff;
+        padding: 15px;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        flex: 1;
+        min-width: 200px;
+        text-align: center;
+      }
+
+      /* Transaction Management Section (Initial Features) */
+      .financial-summary {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-bottom: 20px;
+      }
+      .summary-card {
+        background: #80ffff;
+        padding: 15px;
+        border-radius: 5px;
+        box-shadow: 0px 2px 5px rgb(3, 252, 231);
+        flex: 1;
+        text-align: center;
+        min-width: 150px;
+      }
+      .add-form {
+        margin-bottom: 20px;
+      }
+      .add-form input,
+      .add-form select,
+      .add-form button {
+        padding: 8px;
+        margin: 5px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+      }
+      .add-form button {
+        background: #80ff80;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+      }
+      .transactions-table,
+      .customer-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+      }
+      .transactions-table th,
+      .transactions-table td,
+      .customer-table th,
+      .customer-table td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+      }
+      .transactions-table th,
+      .customer-table th {
+        background: #80ff80;
+        color: #fff;
+      }
+
+      /* Additional Admin Modules */
+      .section {
+        background: #fff;
+        padding: 20px;
+        margin-top: 20px;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      .section h2 {
+        margin-top: 0;
+      }
+
+      /* Main Content Layout */
+      .dashboard {
+        max-width: 1200px;
+        margin: 20px auto;
+        padding: 20px;
+        transition: margin-left 0.3s;
+      }
+      .sidebar.active ~ .dashboard {
+        margin-left: 250px;
+      }
+
+      /* 2x2 Charts Layout using CSS Grid */
+      .charts-container {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+        padding-top: 60px;
+      }
+      .chart-card {
+        background: #fff;
+        padding: 15px;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      .chart-title {
+        margin-bottom: 10px;
+        font-size: 16px;
+        text-align: center;
+      }
+      .chart-container {
+        width: 100%;
+        height: 200px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Menu with Sidebar Toggle Button -->
+    <div class="menu">
+      <button class="btn" onclick="toggleSidebar()">
+        <span class="icon">
+          <svg viewBox="0 0 175 80" width="40" height="40">
+            <rect width="80" height="15" rx="10"></rect>
+            <rect y="30" width="80" height="15" rx="10"></rect>
+            <rect y="60" width="80" height="15" rx="10"></rect>
+          </svg>
+        </span>
+      </button>
+    </div>
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="sidebar">
+      <div class="sidebar-title">
+        <span class="material-icons-outlined" onclick="closeSidebar()"
+          >close</span
+        >
+      </div>
+      <ul class="sidebar-list">
+        <li class="sidebar-list-item">
+          <a href="index.html" target="_blank">
+            <span class="material-icons-outlined">dashboard</span> Dashboard
+          </a>
+        </li>
+        <li class="sidebar-list-item">
+          <a href="services.html" target="_blank">
+            <span class="material-icons-outlined">inventory_2</span> Services
+          </a>
+        </li>
+        <li class="sidebar-list-item">
+          <a href="#" target="_blank">
+            <span class="material-icons-outlined">category</span> Categories
+          </a>
+        </li>
+        <li class="sidebar-list-item">
+          <a href="admin.html" target="_blank">
+            <span class="material-icons-outlined">groups</span> Admins
+          </a>
+        </li>
+        <li class="sidebar-list-item">
+          <a href="charts.html" target="_blank">
+            <span class="material-icons-outlined">fact_check</span> Charts
+          </a>
+        </li>
+        <li class="sidebar-list-item">
+          <a href="reports.html" target="_blank">
+            <span class="material-icons-outlined">poll</span> Reports
+          </a>
+        </li>
+        <li class="sidebar-list-item">
+          <a href="settings.html" target="_blank">
+            <span class="material-icons-outlined">settings</span> Settings
+          </a>
+        </li>
+        <!-- Logout Button placed just below Settings -->
+        <li class="sidebar-list-item">
+          <button class="logout-btn" onclick="logout()">Log out</button>
+        </li>
+      </ul>
+    </aside>
+
+    <!-- Main Dashboard Content -->
+    <div class="dashboard">
+      <header class="header">
+        <div class="header-left">
+          <span class="material-icons-outlined">search</span>
+        </div>
+        <div class="header-right">
+          <span class="material-icons-outlined">notifications</span>
+          <span class="material-icons-outlined">email</span>
+          <span class="material-icons-outlined">account_circle</span>
+        </div>
+      </header>
+      <h1 style="text-align: center">Admin Dashboard Charts</h1>
+      <div class="charts-container">
+        <!-- Chart Card 1 -->
+        <div class="chart-card">
+          <h2 class="chart-title">Top 5 Products</h2>
+          <div id="chart1" class="chart-container"></div>
+        </div>
+        <!-- Chart Card 2 -->
+        <div class="chart-card">
+          <h2 class="chart-title">Purchase & Sales Orders</h2>
+          <div id="chart2" class="chart-container"></div>
+        </div>
+        <!-- Chart Card 3 -->
+        <div class="chart-card">
+          <h2 class="chart-title">Monthly Revenue</h2>
+          <div id="chart3" class="chart-container"></div>
+        </div>
+        <!-- Chart Card 4 -->
+        <div class="chart-card">
+          <h2 class="chart-title">Customer Growth</h2>
+          <div id="chart4" class="chart-container"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ApexCharts Script -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/apexcharts/3.35.5/apexcharts.min.js"></script>
+    <script>
+      // Sidebar toggle function
+      function toggleSidebar() {
+        document.getElementById("sidebar").classList.toggle("active");
+      }
+      function closeSidebar() {
+        document.getElementById("sidebar").classList.remove("active");
+      }
+      // Logout function that redirects to login.html
+      function logout() {
+        window.location.href = "login.html";
+      }
+      // Render charts when the DOM is loaded
+      document.addEventListener("DOMContentLoaded", function () {
+        // Chart 1: Top 5 Products (Bar Chart)
+        var options1 = {
+          series: [
+            {
+              name: "Products",
+              data: [44, 55, 41, 67, 22],
+            },
+          ],
+          chart: {
+            type: "bar",
+            height: 200,
+          },
+          plotOptions: {
+            bar: {
+              columnWidth: "50%",
+              distributed: true,
+            },
+          },
+          dataLabels: {
+            enabled: false,
+          },
+          xaxis: {
+            categories: [
+              "Product 1",
+              "Product 2",
+              "Product 3",
+              "Product 4",
+              "Product 5",
+            ],
+          },
+        };
+        var chart1 = new ApexCharts(
+          document.querySelector("#chart1"),
+          options1
+        );
+        chart1.render();
+
+        // Chart 2: Purchase & Sales Orders (Area Chart) without legend
+        var options2 = {
+          series: [
+            {
+              name: "Purchase Orders",
+              data: [30, 40, 35, 50, 49, 60, 70],
+            },
+            {
+              name: "Sales Orders",
+              data: [20, 30, 25, 40, 39, 50, 60],
+            },
+          ],
+          chart: {
+            type: "area",
+            height: 200,
+          },
+          fill: {
+            type: "gradient",
+            gradient: {
+              shadeIntensity: 1,
+              opacityFrom: 0.7,
+              opacityTo: 0.9,
+              stops: [0, 90, 100],
+            },
+          },
+          dataLabels: {
+            enabled: false,
+          },
+          stroke: {
+            curve: "smooth",
+          },
+          xaxis: {
+            categories: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul"],
+          },
+        };
+        var chart2 = new ApexCharts(
+          document.querySelector("#chart2"),
+          options2
+        );
+        chart2.render();
+
+        // Chart 3: Monthly Revenue (Line Chart)
+        var options3 = {
+          series: [
+            {
+              name: "Revenue",
+              data: [20, 30, 40, 50, 60, 70, 80],
+            },
+          ],
+          chart: {
+            type: "line",
+            height: 200,
+          },
+          dataLabels: {
+            enabled: false,
+          },
+          stroke: {
+            curve: "smooth",
+          },
+          xaxis: {
+            categories: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul"],
+          },
+        };
+        var chart3 = new ApexCharts(
+          document.querySelector("#chart3"),
+          options3
+        );
+        chart3.render();
+
+        // Chart 4: Customer Growth (Donut Chart)
+        var options4 = {
+          series: [44, 55, 41],
+          chart: {
+            type: "donut",
+            height: 200,
+          },
+          labels: ["Segment A", "Segment B", "Segment C"],
+          dataLabels: {
+            enabled: true,
+          },
+          legend: {
+            position: "bottom",
+          },
+        };
+        var chart4 = new ApexCharts(
+          document.querySelector("#chart4"),
+          options4
+        );
+        chart4.render();
+      });
+    </script>
+  </body>
+</html>
